@@ -4453,7 +4453,7 @@ subroutine camera_write_image(img,ifill,noclip)
               open(unit=fflo,file='image.bout',status='replace',access='stream')
            endif
         else
-           open(unit=fflo,file='image.out')
+           open(unit=fflo,file=useroutfn)
         endif
      else
         !

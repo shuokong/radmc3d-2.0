@@ -15,6 +15,7 @@ use namelist_module
 !------------------------------------------------------------------------
 
 integer :: userdef_examplevariable      ! You can delete this, just an example
+character*80 :: useroutfn
 
 contains
 
@@ -33,6 +34,7 @@ subroutine userdef_defaults()
   implicit none
   !
   userdef_examplevariable = 0           ! You can delete this, just an example
+  useroutfn = 'image.out'
   !
 end subroutine userdef_defaults
 
@@ -59,6 +61,16 @@ subroutine userdef_commandline(buffer,numarg,iarg,fromstdi,gotit)
      call ggetarg(iarg,buffer,fromstdi)
      iarg = iarg+1
      read(buffer,*) userdef_examplevariable
+     gotit = .true.
+  elseif(buffer(1:9).eq.'useroutfn') then
+     if(iarg.gt.numarg) then
+        write(stdo,*) 'ERROR while reading command line options: cannot read useroutfn.'
+        write(stdo,*) '      Expecting filename char after useroutfn.'
+        stop
+     endif
+     call ggetarg(iarg,buffer,fromstdi)
+     iarg = iarg+1
+     read(buffer,*) useroutfn
      gotit = .true.
   else
      !
