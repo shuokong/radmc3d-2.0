@@ -62,7 +62,7 @@ any directory. What it does is:
   use a bash shell, then you can add the following line to your
   ``$HOME/.bashrc``::
     
-    export PATH=/myhomedirectory/bin/python:$PATH
+    export PATH=/myhomedirectory/bin:$PATH
     
 * It creates a file ``radmc3d`` in this ``$HOME/bin/``
   directory with the correct executable permissions. This file is merely a
@@ -308,7 +308,7 @@ several sub libraries such as ``radmc3dPy.analyze`` and
 distribution, you could do this::
 
   from radmc3dPy import analyze
-  d = readData(ddens=True)
+  d = analyze.readData(ddens=True)
 
 The ``d.rhodust`` array now contains the dust density.
 

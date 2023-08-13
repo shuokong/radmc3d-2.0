@@ -14,5 +14,15 @@ To learn what can be done with RADMC-3D and how to use it, please consult the ex
 
 Simple example models are found in the `examples/` directory. The README files in these directories explain how to run the models.
 
+## Branches
+Updates to RADMC-3D are done carefully. A major new features is typically first offered in a branch (git branch, in github, see the button that says 'master'; if you click on it, you will see other branches).
+
+A branch of particular interest is `camera_openmp`, which is the OpenMP parallellization of the images and spectra, which was implemented by Patrick Sheehan. You are strongly encouraged to try out this branch and test it. If I do not receive bug reports within the coming months, I will merge this into the master branch.
+
+Also a branch of particular interest is `unstruct`, in which unstructured grids are implemented (Delaunay, Voronoi or home-made). If you try this out, please let me know if it works correctly and well, and does not break earlier features of RADMC-3D (backward compatibility). There are likely to be still numerous bugs, so be careful. Once I am confident of this new feature, I will merge it into the master branch.
+
+## News
+Bugfix [11.11.2021] in OpenMP parallellization of thermal Monte Carlo affecting models with multiple dust species and `iranfreqmode=1` in the `radmc3d.inp` file when using `setthreads X` with X>1. Please upgrade to version of 11.11.2021 of the master branch.
+
 ## Website
 For more information, please consult the website http://www.ita.uni-heidelberg.de/~dullemond/software/radmc-3d

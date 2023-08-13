@@ -58,7 +58,7 @@ logical :: mc_openmp_parallel = .false.
 ! (Must ensure huge range here)
 !
 integer(kind=8) :: ieventcounttot
-double precision :: mc_visitcell,mc_revisitcell
+double precision :: mc_visitcell,mc_revisitcell,mc_revisitcell_max
 !
 ! Flag saying whether or not to interpolate the temperature emission
 ! database in temperature
@@ -236,6 +236,16 @@ double precision, allocatable :: mc_stellarsrc_templates(:,:)
 ! Global flag for Monte Carlo
 !
 logical :: mc_photon_destroyed
+!
+! For analysis or debugging: Allowing to record only e.g. second
+! to fourth scattering source or mean intensity (only for monochromatic
+! monte carlo). Note that this does not yield any real observables, but
+! it can help understand the results.
+!
+integer :: selectscat_iscat
+integer :: selectscat_iscat_first = 1
+integer :: selectscat_iscat_last  = 1000000000
+!
 !----TO-ADD----
 !
 ! Array for skipping very optically thick cells
@@ -272,6 +282,8 @@ logical :: mc_photon_destroyed
 !$OMP THREADPRIVATE(alpha_a_pm,mrw_dcumen)
 !$OMP THREADPRIVATE(mc_photon_destroyed)
 !$OMP THREADPRIVATE(mcscat_phasefunc)
+!$OMP THREADPRIVATE(db_cumul)
+!$OMP THREADPRIVATE(selectscat_iscat)
 
 contains
 
@@ -2247,6 +2259,7 @@ subroutine do_monte_carlo_bjorkmanwood(params,ierror,resetseed)
   ieventcounttot = 0
   mc_visitcell = 0
   mc_revisitcell = 0
+  mc_revisitcell_max = 0
   !
   ! If write statistics, then open this file
   !
@@ -2585,7 +2598,8 @@ subroutine do_monte_carlo_bjorkmanwood(params,ierror,resetseed)
    !!$ it is necessary to ensure that only one thread at a time is writing/updating the memory
    !!$ location of the considered variable.
    !
-   !$OMP REDUCTION(+:mc_integerspec,mc_visitcell,mc_revisitcell,ieventcounttot)
+   !$OMP REDUCTION(+:mc_integerspec,mc_visitcell,mc_revisitcell,ieventcounttot) &
+   !$OMP REDUCTION(max:mc_revisitcell_max)
    !
    !$ id=OMP_get_thread_num()
    !$ nthreads=OMP_get_num_threads()
@@ -2852,6 +2866,14 @@ subroutine do_monte_carlo_scattering(params,ierror,resetseed,scatsrc,meanint)
      write(stdo,*) 'WARNING: The mc_scat_maxtauabs is lt 2. While this is'
      write(stdo,*) '       formally OK, we advise making this at least 10.'
      stop
+  endif
+  !
+  ! For the selectscat analysis stuff (normally not important)
+  !
+  if((selectscat_iscat_first.ne.1).or.(selectscat_iscat_last.ne.1000000000)) then
+     write(stdo,*) 'ANALYSIS MODE: Scattering source and mean intensity only for iscat between ', &
+          selectscat_iscat_first,' and ',selectscat_iscat_last
+     write(stdo,*) 'THE RESULTS ARE NOT MEANT FOR PRODUCTION RUNS, ONLY FOR ANALYSIS.'
   endif
   !
   ! Initialize the Monte Carlo module by allocating the required arrays
@@ -3172,7 +3194,8 @@ subroutine do_monte_carlo_scattering(params,ierror,resetseed,scatsrc,meanint)
      !!$ Global variables from 'montecarlo_module.f90' used in the subroutine 'do_monte_carlo_scattering'
      !
      !!$ Local variables from 'do_monte_carlo_scattering'
-     !$OMP REDUCTION(+:mc_integerspec,mc_visitcell,mc_revisitcell,ieventcounttot)
+     !$OMP REDUCTION(+:mc_integerspec,mc_visitcell,mc_revisitcell,ieventcounttot) &
+     !$OMP REDUCTION(max:mc_revisitcell_max)
      !
      !$ id=OMP_get_thread_num()
      !$ nthreads=OMP_get_num_threads()
@@ -4985,6 +5008,7 @@ subroutine walk_full_path_bjorkmanwood(params,ierror)
         !
         mc_visitcell   = mc_visitcell + count_samecell + 1
         mc_revisitcell = mc_revisitcell + count_samecell*count_samecell
+        mc_revisitcell_max = max(mc_revisitcell_max,1.d0*count_samecell)
         count_samecell = 0
      else
         !
@@ -5434,6 +5458,11 @@ subroutine walk_full_path_bjorkmanwood(params,ierror)
                     !
                     ! ...Now let the AMR module find the cell index
                     !
+                    if(igrid_coord.ge.100) then
+                       write(stdo,*) 'ERROR: The Modified Random Walk is called outside of cell.'
+                       write(stdo,*) '       Please warn the author of RADMC-3D.'
+                       stop
+                    endif
                     if(amr_tree_present) then
                        call amr_findcell(ray_cart_x,ray_cart_y,ray_cart_z,acell)
                        ray_index = acell%leafindex
@@ -6127,6 +6156,7 @@ subroutine walk_full_path_scat(params,inu,ierror)
   !
   ok = .true.
   iscatevent = 0
+  selectscat_iscat = 1
 !!  ieventcount = 0         ! For debugging
   do while(ok)
      !
@@ -6245,6 +6275,10 @@ subroutine walk_full_path_scat(params,inu,ierror)
 !!     ieventcount = ieventcount + 1
      !$omp atomic
      ieventcounttot = ieventcounttot + 1
+     !
+     ! For selectscat: Increase counter
+     !
+     selectscat_iscat = selectscat_iscat + 1
      !
      ! Next event
      !
@@ -6894,6 +6928,10 @@ subroutine walk_cells_scat(params,taupath,ener,inu,arrived,ispecc,ierror)
         !
         enerav  = ener * xxtauabs
         !
+        ! For the selectscat analysis stuff (normally not important)
+        !
+        if((selectscat_iscat.ge.selectscat_iscat_first).and.(selectscat_iscat.le.selectscat_iscat_last)) then
+        !
         ! Add photons to scattering source
         !
         ! NOTE: In the original RADMC I did not divide by 4*pi yet; only
@@ -7200,6 +7238,7 @@ subroutine walk_cells_scat(params,taupath,ener,inu,arrived,ispecc,ierror)
            mcscat_meanint(ray_inu,ray_index) =                            &
                 mcscat_meanint(ray_inu,ray_index) + mnint
         endif
+        endif ! This endif is for the selectscat analysis stuff (normally not important)
         !
         ! Compute the location of this point
         !
@@ -7292,6 +7331,10 @@ subroutine walk_cells_scat(params,taupath,ener,inu,arrived,ispecc,ierror)
         ! Compute enerav
         !
         enerav  = ener * xxtauabs
+        !
+        ! For the selectscat analysis stuff (normally not important)
+        !
+        if((selectscat_iscat.ge.selectscat_iscat_first).and.(selectscat_iscat.le.selectscat_iscat_last)) then
         !
         ! Add photons to scattering source
         !
@@ -7558,6 +7601,7 @@ subroutine walk_cells_scat(params,taupath,ener,inu,arrived,ispecc,ierror)
            mcscat_meanint(ray_inu,ray_index) =                            &
                 mcscat_meanint(ray_inu,ray_index) + mnint
         endif
+        endif ! This endif is for the selectscat analysis stuff (normally not important)
         !
         ! Compute the new ener and the new tauabs
         !  
@@ -8323,6 +8367,19 @@ subroutine montecarlo_random_pos_in_cell(icell)
         rn         = ran2(iseed)
         dum        = axi(2,3) - axi(1,3)
         ray_cart_z = axi(1,3) + dum * rn
+        ! BUGFIX 1-D plane-parallel and 2-D pencil-parallel modes 19.06.2021
+        ! Must set x and y to 0, otherwise the ray segment length cannot be
+        ! properly computed, because x and y become of order 1e90 large.
+        ! It has no consequences for the normal RADMC-3D functionality, only
+        ! for the 1-D plane-parallel and 2-D pencil-parallel modes.
+        ! Thanks, Til Birnstiel, for spotting and reporting the error.
+        if(igrid_coord.eq.10) then
+           ray_cart_x = 0.d0
+           ray_cart_y = 0.d0
+        endif
+        if(igrid_coord.eq.20) then
+           ray_cart_x = 0.d0
+        endif
      elseif(igrid_coord.lt.200) then
         !
         ! Spherical coordinates
@@ -8879,11 +8936,13 @@ subroutine make_emiss_dbase(ntemp,temp0,temp1)
      write(stdo,*) 'ERROR in Montecarlo Module: Could not allocate db_cumulnorm'
      stop 
   endif
+  !$OMP PARALLEL
   allocate(db_cumul(freq_nr+1),STAT=ierr)
   if(ierr.ne.0) then
      write(stdo,*) 'ERROR in Montecarlo Module: Could not allocate db_cumul'
      stop 
   endif
+  !$OMP END PARALLEL
   !
   ! Allocate array used internally for picking random frequency
   !
@@ -9004,11 +9063,11 @@ subroutine free_emiss_dbase()
   db_ntemp=0
   if(allocated(db_temp)) deallocate(db_temp)
   if(allocated(db_cumulnorm)) deallocate(db_cumulnorm)
-  if(allocated(db_cumul)) deallocate(db_cumul)
   if(allocated(db_enertemp)) deallocate(db_enertemp)
   if(allocated(db_logenertemp)) deallocate(db_logenertemp)
   if(allocated(db_emiss)) deallocate(db_emiss)
   !$OMP PARALLEL
+  if(allocated(db_cumul)) deallocate(db_cumul)
   if(allocated(enercum)) deallocate(enercum)
   !$OMP END PARALLEL
 end subroutine free_emiss_dbase

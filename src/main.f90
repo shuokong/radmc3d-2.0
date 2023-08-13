@@ -370,6 +370,13 @@ program radmc3d
   !
   call read_radmcinp_file()
   !
+  ! Check that SED and lines are not on simultaneously
+  !
+  if(rt_incl_lines.and.do_raytrace_spectrum.and.camera_setfreq_global) then
+     write(stdo,*) 'ERROR: Cannot make SED with line mode on.'
+     stop
+  endif
+  !
   ! If OMP, then immediately set the nr of threads here, now that we
   ! know which value it should have: the setthreads variable.
   ! Bugfix by Jon Ramsey 22.03.2016
@@ -841,6 +848,8 @@ program radmc3d
                       ieventcounttot/(1.d0*rt_mcparams%nphot_therm)
            write(stdo,*) 'Average nr of times a photon stays in the same cell  = ', &
                       mc_revisitcell/(1.d0*mc_visitcell)
+           write(stdo,*) 'Maximum nr of times a photon stayed in the same cell = ', &
+                      int(mc_revisitcell_max)
            if(.not.rt_mcparams%mod_random_walk) then
               if(mc_revisitcell/(1.d0*mc_visitcell).gt.400) then
                  write(stdo,*) '   ---> This number is very high, and therefore responsible for slow performance.'
@@ -2343,6 +2352,13 @@ subroutine read_radmcinp_file()
      call parse_input_double ('camera_min_drr@               ',mindrr)
      call parse_input_integer('camera_interpol_jnu@          ',interpoljnu)
      call parse_input_double ('camera_maxdphi@               ',camera_maxdphi)
+     idum=0
+     call parse_input_integer('camera_diagnostics_subpix@    ',idum)
+     if(idum.eq.0) then
+        camera_diagnostics_subpix = .false.
+     else
+        camera_diagnostics_subpix = .true.
+     endif
      call parse_input_integer('sources_interpol_jnu@         ',interpoljnu)
 !     call parse_input_double ('lines_maxdoppler@             ',lines_maxdoppler)
      call parse_input_integer('lines_mode@                   ',lines_mode)
@@ -3018,6 +3034,34 @@ subroutine interpet_command_line_options(gotit,fromstdi,quit)
         call ggetarg(iarg,buffer,fromstdi)
         iarg = iarg+1
         read(buffer,*) rt_mcparams%nphot_mono
+        gotit = .true.
+     elseif(buffer(1:10).eq.'selectscat') then
+        !
+        ! Select which scattering to include. For instance, if you want to
+        ! see the role of multiple scattering, you can do selectscat 2 1000000.
+        ! Or if you are interested only in the second scattering you can do
+        ! selectscat 2 2. Or only first scattering: selectscat 1 1.
+        ! NOTE: Only for analysis or debugging, not for production runs!
+        !
+        if(iarg+1.gt.numarg) then
+           write(stdo,*) 'ERROR while reading command line options: cannot read selectscat.'
+           write(stdo,*) '      Expecting 2 integers after selectscat.'
+           stop
+        endif
+        call ggetarg(iarg,buffer,fromstdi)
+        iarg = iarg+1
+        read(buffer,*) selectscat_iscat_first
+        if(selectscat_iscat_first.lt.1) then
+           write(stdo,*) 'ERROR: selectscat_iscat_first must be .ge.1'
+           stop 3284
+        endif
+        call ggetarg(iarg,buffer,fromstdi)
+        iarg = iarg+1
+        read(buffer,*) selectscat_iscat_last
+        if(selectscat_iscat_last.lt.selectscat_iscat_first) then
+           write(stdo,*) 'ERROR: selectscat_iscat_last must be .ge.selectscat_iscat_first'
+           stop 3285
+        endif
         gotit = .true.
      elseif(buffer(1:10).eq.'countwrite') then
         !
@@ -3902,22 +3946,6 @@ subroutine interpet_command_line_options(gotit,fromstdi,quit)
         write(stdo,*) '         So I ignore this option now.'
         endif
   endif
-  !
-  ! Check that SED and lines are not on simultaneously
-  !
-  if(rt_incl_lines.and.do_raytrace_spectrum.and.camera_setfreq_global) then
-     write(stdo,*) 'ERROR: Cannot make SED with line mode on.'
-     stop
-  endif
-  !
-  ! If spectrum is on, and line is on, and nr of frequencies is 1, then 
-  ! we put nr of freqs to 100 per default
-  !
-!  if(rt_incl_lines.and.do_raytrace_spectrum.and.(lines_user_nrfreq.le.1)) then
-!     write(stdo,*) 'For line spectra we take nr of frequencies to 100 by default'
-!     write(stdo,*) '   Specify with linenlam or linenfreq if you want another nr.'
-!     lines_user_nrfreq = 100
-!  endif
   !
   ! Check for camera 
   !
