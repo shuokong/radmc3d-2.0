@@ -37,6 +37,7 @@
 !=======================================================================
 module lines_module
 use amr_module
+use ugrid_module
 use rtglobal_module
 use ioput_module
 use mathroutines_module
@@ -279,6 +280,17 @@ double precision :: lines_nonlte_convcrit = 1d-2
 !
 logical :: lines_autosubset=.true.
 !
+! As an alternative to "doppler catching" you can avoid
+! doppler jumps by artificially broadning the local line
+! width. This is done if this parameter is set to >0.
+! Set it, for instance, to 1.0, meaning that it will make
+! sure that the local line width is at least 1.0x the
+! maximum local velocity difference. Setting it >1.0 is
+! safer but less accurate, <1.0 is more accurate but
+! could yield stronger dopper jumps.
+!
+double precision :: lines_artificial_widening_factor = 0.d0
+!
 contains
 
 
@@ -515,6 +527,37 @@ subroutine read_lines_all(action)
      case default
         write(stdo,*) 'Unknown line transfer method: ',lines_mode
      end select
+  endif
+  !
+  ! Check (and possibly correct) for doppler jump risks
+  !
+  if(allocated(gasvelocity).and.allocated(gastemp)) then
+     if(lines_artificial_widening_factor.le.0) then
+        !
+        ! By default we do not artificially widen the local line width. Then we want to
+        ! check if we are in danger of doppler jumps.
+        !
+        lines_maxrelshift = 0.d0
+        call lines_compute_maxrellineshift()
+        if(lines_maxrelshift.gt.0.7d0) then
+           write(stdo,*) 'WARNING: cell-to-cell line doppler shifts are large compared to the local line width.'
+           write(stdo,*) '   In this model the largest dv_doppler/dv_linewidth = ',lines_maxrelshift
+           write(stdo,*) '   If you use the doppler catching mode, you are fine. If not, you may risk doppler jump effects.'
+        endif
+     else
+        !
+        ! But if lines_artificial_widening_factor is >0.0 (typically around 1.0), we
+        ! artificially widen the local microturbulent line width to assure that
+        ! doppler jumps are avoided. How well they are avoided depends on the
+        ! value of lines_artificial_widening_factor. A good value is 1.0, which
+        ! means that the local line width is assured not to drop below the largest
+        ! velocity difference between neighboring cells. A value >1.0 would give
+        ! more safety, but smears out the line emission more (due to excessive
+        ! line width). A value <1.0 will not avoid doppler jumps entirely.
+        !
+        write(stdo,*) '  --> To avoid doppler jumps, the lines are artificially widened'
+        call lines_artificially_widen()
+     endif
   endif
   !
 end subroutine read_lines_all
@@ -2710,6 +2753,9 @@ recursive subroutine lines_amr_recursive_velo(cell,idir,velo)
   double precision :: velo,velochild
   type(amr_branch), pointer :: cell,child
   integer :: ix,iy,iz,indexchild,cnt
+  if(igrid_type.ge.100) then
+     stop 2329
+  endif
   !
   ! Reset velo
   !
@@ -2762,7 +2808,9 @@ subroutine lines_compute_velgradient(index,velgradient,maxdiff)
   implicit none
   double precision :: velgradient,velgradsum,factor(1:3)
   double precision :: pos0(1:3),pos1,vel0(1:3),vel1,adj_ds
+  double precision :: n(1:3),dv(1:3),dx(1:3),ddv
   integer :: index,numvels,level
+  integer :: iwall,iiwall,icellnext
   type(amr_branch), pointer :: cell,neighbor
   integer :: ixx,iyy,izz,indexn,ixn,iyn,izn
   logical, optional :: maxdiff
@@ -2793,24 +2841,26 @@ subroutine lines_compute_velgradient(index,velgradient,maxdiff)
   !
   ! Get cell position
   !
-  if(amr_tree_present) then
-     !
-     ! The AMR tree is available, so we use it
-     !
-     !!! BUG (30.12.2011): cell  => amr_theleafs(index)%link
-     cell  => amr_index_to_leaf(index)%link
-     pos0(1) = amr_finegrid_xc(cell%ixyzf(1),1,cell%level)
-     pos0(2) = amr_finegrid_xc(cell%ixyzf(2),2,cell%level)
-     pos0(3) = amr_finegrid_xc(cell%ixyzf(3),3,cell%level)
-  else
-     !
-     ! We have a regular grid, so we compute the position
-     ! using ixx,iyy,izz
-     !
-     call amr_regular_get_ixyz(index,ixx,iyy,izz)
-     pos0(1) = amr_finegrid_xc(ixx,1,0)
-     pos0(2) = amr_finegrid_xc(iyy,2,0)
-     pos0(3) = amr_finegrid_xc(izz,3,0)
+  if(igrid_type.lt.100) then
+     if(amr_tree_present) then
+        !
+        ! The AMR tree is available, so we use it
+        !
+        !!! BUG (30.12.2011): cell  => amr_theleafs(index)%link
+        cell  => amr_index_to_leaf(index)%link
+        pos0(1) = amr_finegrid_xc(cell%ixyzf(1),1,cell%level)
+        pos0(2) = amr_finegrid_xc(cell%ixyzf(2),2,cell%level)
+        pos0(3) = amr_finegrid_xc(cell%ixyzf(3),3,cell%level)
+     else
+        !
+        ! We have a regular grid, so we compute the position
+        ! using ixx,iyy,izz
+        !
+        call amr_regular_get_ixyz(index,ixx,iyy,izz)
+        pos0(1) = amr_finegrid_xc(ixx,1,0)
+        pos0(2) = amr_finegrid_xc(iyy,2,0)
+        pos0(3) = amr_finegrid_xc(izz,3,0)
+     endif
   endif
   !
   ! Get factors for coordinate systems
@@ -2835,6 +2885,7 @@ subroutine lines_compute_velgradient(index,velgradient,maxdiff)
   ! for each one found, compute a contribution to the 
   ! overall average velocity gradient.
   !
+  if(igrid_type.lt.100) then
   if(amr_tree_present) then
      !
      ! The AMR tree is available, so we use that, and we
@@ -3137,6 +3188,40 @@ subroutine lines_compute_velgradient(index,velgradient,maxdiff)
            numvels    = numvels + 1
         endif
      endif
+  endif
+  else
+     !
+     ! Unstructured grid: Loop over all cell walls. For each cell
+     ! wall check if an adjacent cell is there. If so, then compute
+     ! the projected velocity gradient toward that cell center.
+     !
+     do iwall=1,ugrid_cell_nwalls(index)
+        iiwall  = ugrid_cell_iwalls(index,iwall)
+        if(iiwall.gt.0) then
+           if(ugrid_wall_icells(iiwall,1).eq.index) then
+              icellnext = ugrid_wall_icells(iiwall,2)
+           else
+              icellnext = ugrid_wall_icells(iiwall,1)
+              if(ugrid_wall_icells(iiwall,2).ne.index) then
+                 write(*,*) 'Error: Cell wall inconsistency'
+                 stop 5472
+              endif
+           endif
+           if(icellnext.gt.0) then
+              n(1:3)  = ugrid_cell_sgnwalls(index,iwall)*ugrid_wall_n(iiwall,1:3)
+              dx(1:3) = ugrid_cellcenters(icellnext,1:3)-ugrid_cellcenters(index,1:3)
+              adj_ds  = sqrt(dx(1)**2+dx(2)**2+dx(3)**2)
+              dv(1:3) = gasvelocity(1:3,icellnext)-gasvelocity(1:3,index)
+              ddv     = dv(1)*n(1) + dv(2)*n(2) + dv(3)*n(3)
+              if(average) then
+                 velgradsum = velgradsum + abs(ddv/adj_ds)
+              else
+                 velgradsum = max(velgradsum,abs(ddv))
+              endif
+              numvels = numvels + 1
+           endif
+        endif
+     enddo
   endif
   !
   ! Check
@@ -4243,7 +4328,7 @@ subroutine write_levelpop()
   !
   do ispec=1,lines_nr_species
      if(lines_species_fullmolec(ispec)) then
-        if(igrid_type.lt.100) then
+        !if(igrid_type.lt.100) then
            !
            ! Regular (AMR) grid
            ! 
@@ -4255,7 +4340,11 @@ subroutine write_levelpop()
            !
            ! Do a stupidity check
            !
-           if(nrcells.ne.amr_nrleafs) stop 3209
+           if(igrid_type.lt.100) then
+              if(nrcells.ne.amr_nrleafs) stop 3209
+           elseif(igrid_type.ge.200) then
+              if(nrcells.ne.ugrid_ncells) stop 3209
+           endif
            !
            ! Open file and write header
            !
@@ -4361,10 +4450,10 @@ subroutine write_levelpop()
            ! Close file
            !
            close(1)
-        else
-           write(stdo,*) 'ERROR: For the moment no other grid type supported as AMR for writing out level populations'
-           stop
-        endif
+        !else
+        !   write(stdo,*) 'ERROR: For the moment no other grid type supported as AMR for writing out level populations'
+        !   stop
+        !endif
      endif
   enddo ! Loop over species
   !
@@ -5368,6 +5457,15 @@ subroutine lines_compute_maxrellineshift()
   implicit none
   doubleprecision :: width_local,relshift,dv
   integer :: index,icell
+  logical :: incl_microturb
+  !
+  ! Check
+  !
+  if(allocated(lines_microturb)) then
+     incl_microturb = .true.
+  else
+     incl_microturb = .false.
+  endif
   !
   ! Reset 
   !
@@ -5381,7 +5479,11 @@ subroutine lines_compute_maxrellineshift()
      ! Compute the local line width in cm/s for the most massive molecule
      ! in the current model
      !
-     width_local = sqrt(2*kk*gastemp(index)/lines_umass_max+lines_microturb(index)**2)
+     if(incl_microturb) then
+        width_local = sqrt(2*kk*gastemp(index)/lines_umass_max+lines_microturb(index)**2)
+     else
+        width_local = sqrt(2*kk*gastemp(index)/lines_umass_max)
+     endif
      !
      ! Compute the maximum velocity difference between this
      ! cell and adjacent cells (maximum of the 2x3 directions)
@@ -5398,6 +5500,69 @@ subroutine lines_compute_maxrellineshift()
      !
   enddo
 end subroutine lines_compute_maxrellineshift
+
+
+!--------------------------------------------------------------------------------
+!       ARTIFICIALLY BROADEN THE LINE TO AVOID DOPPLER JUMPS
+!
+! (New 2023.05.31) The elegant way to deal with doppler jumps is the "doppler
+! catching" method. However, sometimes this is either not practical or not
+! possible. An alternative way to avoid doppler jumps is to artificially broaden
+! the local line width such that doppler jumps cannot occur.  This is done when
+! setting lines_artificial_widening_factor to >0.  Set it, for instance, to 1.0,
+! meaning that it will make sure that the local line width is at least 1.0x the
+! maximum local velocity difference. Setting it >1.0 is safer but less accurate,
+! <1.0 is more accurate but could yield stronger dopper jumps.
+!--------------------------------------------------------------------------------
+subroutine lines_artificially_widen()
+  implicit none
+  doubleprecision :: width2_therm,dummy,dv
+  integer :: index,icell,ierr
+  !
+  ! Check
+  !
+  if(lines_artificial_widening_factor.le.0.d0) stop 8301
+  !
+  ! Make sure lines_microturb is allocated
+  !
+  if(.not.(allocated(lines_microturb))) then
+     allocate(lines_microturb(1:nrcells),STAT=ierr)
+     if(ierr.ne.0) then
+        write(stdo,*) 'ERROR: Could not allocate the lines_microturb() array'
+        stop
+     endif
+     lines_microturb(:) = 0.d0
+  endif
+  !
+  ! Visit all cells
+  !
+  do icell=1,nrcells
+     index = cellindex(icell)
+     !
+     ! Compute the local thermal line width in cm/s for the most massive molecule
+     ! in the current model
+     !
+     width2_therm = 2*kk*gastemp(index)/lines_umass_max
+     !
+     ! Compute the maximum velocity difference between this
+     ! cell and adjacent cells
+     !
+     call lines_compute_velgradient(index,dv,maxdiff=.true.)
+     !
+     ! Check if we need to artificially widen the line (i.e., that the
+     ! local thermal + microturbulent line width is not large enough
+     ! to avoid doppler jumps)
+     !
+     dummy    = (dv*lines_artificial_widening_factor)**2 - width2_therm
+     if(dummy.gt.lines_microturb(index)**2) then
+        !
+        ! Yes we do. We adjust the microturbulent line width accordingly.
+        !
+        lines_microturb(index) = sqrt(dummy)
+     endif
+     !
+  enddo
+end subroutine lines_artificially_widen
 
 
 

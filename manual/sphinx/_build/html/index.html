@@ -259,6 +259,13 @@
 <li class="toctree-l3"><a class="reference internal" href="dustradtrans.html#effect-of-aligned-grains-on-the-scattering">Effect of aligned grains on the scattering</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="dustradtrans.html#grain-size-distributions">Grain size distributions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="dustradtrans.html#quick-summary-of-how-to-implement-grain-sizes">Quick summary of how to implement grain sizes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dustradtrans.html#method-1-size-distribution-in-the-opacity-file-faster">Method 1: Size distribution in the opacity file (faster)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dustradtrans.html#method-2-size-distribution-in-the-density-file-better">Method 2: Size distribution in the density file (better)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dustradtrans.html#the-mathematics-of-grain-size-distributions">The mathematics of grain size distributions</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="lineradtrans.html">Line radiative transfer</a><ul>
@@ -347,7 +354,7 @@
 <li class="toctree-l3"><a class="reference internal" href="gridding.html#on-the-successively-regular-kind-of-data-storage-and-its-slight-redundancy">On the ‘successively regular’ kind of data storage, and its slight redundancy</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="gridding.html#unstructured-grids">Unstructured grids</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gridding.html#unstructured-grids-delaunay-voronoi-or-more-general">Unstructured grids (Delaunay, Voronoi, or more general)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="gridding.html#d-plane-parallel-models">1-D Plane-parallel models</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="gridding.html#making-a-spectrum-of-the-1-d-plane-parallel-atmosphere">Making a spectrum of the 1-D plane-parallel atmosphere</a></li>
 <li class="toctree-l3"><a class="reference internal" href="gridding.html#in-1-d-plane-parallel-no-star-but-incident-parallel-flux-beams">In 1-D plane-parallel: no star, but incident parallel flux beams</a></li>
@@ -396,8 +403,9 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="toolsinside.html">Analysis tools inside of radmc3d</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="toolsinside.html#making-a-regularly-spaced-datacube-subbox-of-amr-based-models">Making a regularly-spaced datacube (‘subbox’) of AMR-based models</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="toolsinside.html#creating-and-reading-a-subbox">Creating and reading a subbox</a></li>
+<li class="toctree-l3"><a class="reference internal" href="toolsinside.html#creating-a-subbox">Creating a subbox</a></li>
 <li class="toctree-l3"><a class="reference internal" href="toolsinside.html#format-of-the-subbox-output-files">Format of the subbox output files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="toolsinside.html#using-the-radmc3d-tools-to-read-the-subbox-data">Using the <code class="docutils literal notranslate"><span class="pre">radmc3d_tools</span></code> to read the subbox data</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="toolsinside.html#alternative-to-subbox-arbitrary-sampling-of-amr-based-models">Alternative to subbox: arbitrary sampling of AMR-based models</a></li>
@@ -414,10 +422,11 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="inputoutputfiles.html">Main input and output files of RADMC-3D</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="inputoutputfiles.html#input-radmc3d-inp">INPUT: radmc3d.inp</a></li>
-<li class="toctree-l2"><a class="reference internal" href="inputoutputfiles.html#input-required-amr-grid-inp">INPUT (required): amr_grid.inp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="inputoutputfiles.html#input-required-amr-grid-inp-or-unstr-grid-inp">INPUT (required): amr_grid.inp or unstr_grid.inp</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="inputoutputfiles.html#regular-grid">Regular grid</a></li>
 <li class="toctree-l3"><a class="reference internal" href="inputoutputfiles.html#oct-tree-style-amr-grid">Oct-tree-style AMR grid</a></li>
 <li class="toctree-l3"><a class="reference internal" href="inputoutputfiles.html#layer-style-amr-grid">Layer-style AMR grid</a></li>
+<li class="toctree-l3"><a class="reference internal" href="inputoutputfiles.html#unstructured-grid">Unstructured grid</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="inputoutputfiles.html#input-required-for-dust-transfer-dust-density-inp">INPUT (required for dust transfer): dust_density.inp</a><ul>

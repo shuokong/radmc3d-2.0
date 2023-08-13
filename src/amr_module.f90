@@ -2292,6 +2292,76 @@ return
 end subroutine amr_findcell
 
 
+!-------------------------------------------------------------------------
+!                   A MORE GENERAL VERSION OF FINDCELL
+!
+! This function finds the cell independent of coordinate system and AMR
+! refinement or not. Input is the cartesian (!) location x,y,z, and if
+! spherical coordinates are used, these are automatically converted into
+! r,theta,phi. So it is advisable to always use this subroutine instead
+! of the more basic amr_findcell().
+!-------------------------------------------------------------------------
+subroutine amr_findcellindex_general(x,y,z,cellindex)
+  implicit none
+  double precision :: x,y,z,r,theta,phi
+  type(amr_branch), pointer :: a
+  integer :: ix,iy,iz,cellindex
+  !
+  cellindex=0
+  if(amr_coordsystem.lt.100) then
+     !
+     ! Cartesian coordinates
+     !
+     if(amr_tree_present) then
+        call amr_findcell(x,y,z,a)
+        if(associated(a)) then
+           cellindex = a%leafindex
+        else
+           cellindex = 0
+        endif
+     else
+        call amr_findbasecell(x,y,z,ix,iy,iz)
+        if(ix.gt.0) then
+           cellindex = ix+(iy-1)*amr_grid_nx+(iz-1)*amr_grid_nx*amr_grid_ny
+        else
+           cellindex = 0
+        endif
+     endif
+  elseif((amr_coordsystem.ge.100).and.(amr_coordsystem.lt.200)) then
+     !
+     ! Spherical coordinates
+     !
+     ! Convert x,y,z to spherical coordinates
+     !
+     call amr_xyz_to_rthphi(x,y,z,r,theta,phi)
+     !
+     ! Find the cell in which the star resides
+     !
+     if(theta.eq.pihalf) then
+        theta = pihalf - 1d-8   ! Only for cell searching
+     endif
+     if(amr_tree_present) then
+        call amr_findcell(r,theta,phi,a)
+        if(associated(a)) then
+           cellindex = a%leafindex
+        else
+           cellindex = 0
+        endif
+     else
+        call amr_findbasecell(r,theta,phi,ix,iy,iz)
+        if(ix.gt.0) then
+           cellindex = ix+(iy-1)*amr_grid_nx+(iz-1)*amr_grid_nx*amr_grid_ny
+        else
+           cellindex = 0
+        endif
+     endif
+  else
+     write(stdo,*) 'ERROR: Other coordinate not yet implemented'
+     stop 6491
+  endif
+end subroutine amr_findcellindex_general
+
+
 !--------------------------------------------------------------------------
 !                         STRING COMPARING
 !--------------------------------------------------------------------------
@@ -3160,11 +3230,19 @@ if(chsp.and.((amr_coordsystem.ge.100).and.(amr_coordsystem.lt.200))) then
       zi(1) = 0.d0
       zi(2) = twopi
    else
-      if((abs(zi(1)).lt.1d-4*abs(zi(2)-zi(1))).and.(zi(1).ne.0.d0)) then
+      if(zi(1).lt.-1d-4) then
+         write(stdo,*) 'ERROR: In spherical coordinates, phi must be >=0.'
+         stop
+      endif
+      if(zi(nz+1).gt.twopi+1d-4) then
+         write(stdo,*) 'ERROR: In spherical coordinates, phi must be <=2*pi.'
+         stop
+      endif
+      if((abs(zi(1)).lt.1d-2).and.(zi(1).ne.0.d0)) then
          write(stdo,*) '   Adjusting phi(1) to exactly 0...'
          zi(1) = 0.d0
       endif
-      if((abs(zi(nz+1)-twopi).lt.1d-4*abs(zi(nz+1)-zi(nz))).and.(zi(nz+1).ne.twopi)) then
+      if((abs(zi(nz+1)-twopi).lt.1d-2).and.(zi(nz+1).ne.twopi)) then
          write(stdo,*) '   Adjusting phi(nz+1) to exactly 2*pi...'
          zi(nz+1) = twopi
       endif
@@ -3178,6 +3256,14 @@ if(chsp.and.((amr_coordsystem.ge.100).and.(amr_coordsystem.lt.200))) then
             write(stdo,*) '      switch off the phi-direction.'
             stop
          endif
+      else
+         write(stdo,*) 'Please note: The phi-grid does not start exactly at 0 and end exactly at 2*pi.'
+         write(stdo,*) '             This means that you want to model only a part of 360 degrees.'
+         write(stdo,*) '             If this is not your intention, please make sure to set the'
+         write(stdo,*) '             phi-grid exactly from 0 to 2*pi in double-precision.'
+         write(stdo,*) '             On the other hand, if it IS your intention, then be aware'
+         write(stdo,*) '             that RADMC-3D does not handle rays exiting phi=phi_min and'
+         write(stdo,*) '             re-entering the grid at phi=phi_max (or vv).'
       endif
    endif
 endif

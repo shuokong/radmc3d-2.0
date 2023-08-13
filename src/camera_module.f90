@@ -1,6 +1,7 @@
 module camera_module
   use rtglobal_module
   use amrray_module
+  use ugrid_module
   use dust_module
   use lines_module
   use gascontinuum_module
@@ -310,6 +311,38 @@ subroutine camera_init()
   integer :: ierr,inu,ispec
   double precision :: temp
   !
+  ! Check coord type
+  !
+  if(igrid_type.ge.200) then
+     !
+     ! When using unstructured grids, many special features are not available.
+     ! Check...
+     !
+     amr_dim = 3   ! Should not be necessary, but just in case
+     if(igrid_coord.ge.100) then
+        write(stdo,*) 'ERROR: With unstructured grid: Only cartesian coordinates allowed.'
+        stop
+     endif
+     if(amrray_mirror_equator) then
+        write(stdo,*) 'ERROR: With unstructured grid no equator mirroring allowed.'
+        stop
+     endif
+     if(circular_images) then
+        write(stdo,*) 'ERROR: With unstructured grid no circular images.'
+        stop
+     endif
+     if(incl_thermbc.ne.0) then
+        write(stdo,*) 'ERROR: With unstructured grid, thermal boundary conditions'
+        write(stdo,*) '       are not yet implemented. But it should be doable to'
+        write(stdo,*) '       implement it, so if you need it, ask the author.'
+        stop
+     endif
+     if(.not.allocated(ugrid_cell_size)) then
+        write(stdo,*) 'ERROR: With unstructured grid, ugrid_cell_size must be defined.'
+        stop
+     endif
+  endif
+  !
   ! Currently the polarization module is not compatible with mirror
   ! symmetry mode in spherical coordinates. 
   !
@@ -338,7 +371,7 @@ subroutine camera_init()
   ! not compatible with 2-D spherical coordinates.
   !
   if((scattering_mode.ge.2).and.(igrid_coord.ge.100).and. &
-     (amr_dim.eq.1)) then
+     (igrid_type.lt.100).and.(amr_dim.eq.1)) then
      write(stdo,*) 'ERROR: Non-isotropic scattering is incompatible with'
      write(stdo,*) '       1-D spherical coordinates.'
      stop
@@ -354,7 +387,7 @@ subroutine camera_init()
   ! you must have full 3-D spherical coordinates
   !
   if((rt_incl_lines).and.(camera_secondorder).and. &
-       (igrid_coord.ge.100).and.(amr_dim.ne.3)) then
+       (igrid_type.lt.100).and.(igrid_coord.ge.100).and.(amr_dim.ne.3)) then
      write(stdo,*) 'ERROR: Line radiative transfer with second order'
      write(stdo,*) '       integration is incompatible with'
      write(stdo,*) '       2-D spherical coordinates. Use 3-D spherical '
@@ -662,8 +695,11 @@ subroutine camera_set_ray(px,py,x,y,z,dirx,diry,dirz,distance)
         stop 612
      endif
   else
-     write(stdo,*) 'ERROR in camera module: non-regular grids not yet ready'
-     stop
+     !
+     ! Unstructured grid
+     !
+     shift = shift + 3*grid_contsph_r
+     !
   endif
   shift = shift*3        ! For safety, put it even further back
   !
@@ -1394,8 +1430,18 @@ subroutine camera_serial_raytrace(nrfreq,inu0,inu1,x,y,z,dx,dy,dz,distance,   &
         stop
      endif
   else
-     write(stdo,*) 'SORRY: Delaunay or Voronoi grids not yet implemented'
-     stop
+     !
+     ! Find cell in ugrid
+     !
+     call ugrid_findcell_by_walking(ray_cart_x,ray_cart_y,ray_cart_z,ray_index)
+     ugrid_find_cell_start = ray_index
+     ray_indexnext = 0
+     !
+     ! Reset the wall indices
+     !
+     ray_curr_iwall = 0
+     ray_next_iwall = 0
+     !
   endif
   !
   ! Now trace
@@ -1626,8 +1672,22 @@ subroutine camera_serial_raytrace(nrfreq,inu0,inu1,x,y,z,dx,dy,dz,distance,   &
         camera_istar = amrray_ispherehit
         !   
      else
-        write(stdo,*) 'SORRY: Delaunay or Voronoi grids not yet implemented'
-        stop
+        !
+        ! Unstructured grid
+        !
+        call ugrid_find_next_location(ray_dsend,                     &
+                ray_cart_x,ray_cart_y,ray_cart_z,                    &
+                ray_cart_dirx,ray_cart_diry,ray_cart_dirz,           &
+                ray_index,ray_indexnext,ray_ds,ray_curr_iwall,       &
+                ray_next_iwall,arrived)        
+        !
+        ! If in cell, then update celldxmin
+        !
+        if(ray_index.gt.0) then
+           if(ugrid_cell_size(ray_index).gt.0.d0) then
+              celldxmin = min(celldxmin,ugrid_cell_size(ray_index))
+           endif
+        endif
      endif
      !
      ! Path length
@@ -1716,7 +1776,13 @@ subroutine camera_serial_raytrace(nrfreq,inu0,inu1,x,y,z,dx,dy,dz,distance,   &
                     stop 498
                  endif
               else
-                 stop 499
+                 !
+                 ! Unstructured grid
+                 !
+                 call sources_ugrid_find_srcalp_interpol(   &
+                         ray_cart_x,ray_cart_y,ray_cart_z,  &
+                         snu_curr,anu_curr,                 &
+                         camera_stokesvector,.false.)
               endif
               !
               ! If sources_interpol_jnu is set, then what we get back
@@ -2689,6 +2755,7 @@ subroutine camera_serial_raytrace(nrfreq,inu0,inu1,x,y,z,dx,dy,dz,distance,   &
      ! Now make next cell the current cell
      !
      ray_index = ray_indexnext
+     ray_curr_iwall = ray_next_iwall
      !
      ! Do the same for the pointers.
      ! This is grid type dependent.
@@ -2712,9 +2779,6 @@ subroutine camera_serial_raytrace(nrfreq,inu0,inu1,x,y,z,dx,dy,dz,distance,   &
            amrray_iy_curr = -1
            amrray_iz_curr = -1
         endif
-     else
-        write(stdo,*) 'ERROR: This grid type not yet implemented'
-        stop
      endif
      !
   enddo
@@ -2726,9 +2790,6 @@ subroutine camera_serial_raytrace(nrfreq,inu0,inu1,x,y,z,dx,dy,dz,distance,   &
         celldxmin = (amr_grid_xi(2,1)-amr_grid_xi(1,1)) / (2**deepestlevel)
      endif
      ! For the other coordinates celldxmin is determined on-the-fly
-  else
-     write(stdo,*) 'SORRY: Delaunay or Voronoi grids not yet implemented'
-     stop
   endif
   !
 end subroutine camera_serial_raytrace
@@ -4113,7 +4174,17 @@ subroutine camera_make_rect_image(img,tausurf)
            !
            ! Then call the subroutine
            !
-           call sources_compute_snualphanu_at_vertices(inu0,camera_stokesvector)
+           if(igrid_type.lt.100) then
+              !
+              ! Regular or AMR type grid
+              !
+              call sources_compute_snualphanu_at_vertices(inu0,camera_stokesvector)
+           else
+              !
+              ! Unstructured grid
+              !
+              call sources_ugrid_compute_snualphanu_at_vertices(inu0,camera_stokesvector)
+           endif
         endif
         !
         ! Now make the image for this wavelength only
@@ -5644,6 +5715,7 @@ subroutine camera_ray1d_raytrace(nrfreq,x,y,z,dx,dy,dz,distance,celldxmin,&
      ! Now make next cell the current cell
      !
      ray_index = ray_indexnext
+     ray_curr_iwall = ray_next_iwall
      !
      ! Do the same for the pointers.
      ! This is grid type dependent.
@@ -5667,9 +5739,6 @@ subroutine camera_ray1d_raytrace(nrfreq,x,y,z,dx,dy,dz,distance,celldxmin,&
            amrray_iy_curr = -1
            amrray_iz_curr = -1
         endif
-     else
-        write(stdo,*) 'ERROR: This grid type not yet implemented'
-        stop
      endif
      !
   enddo
@@ -5741,7 +5810,7 @@ subroutine set_camera_frequencies(nfr,freq1,freq2)
   integer :: inu,ierr,i,iformat
   integer, intent(in), optional :: nfr
   double precision, intent(in), optional :: freq1,freq2
-  logical :: fex1,fex2
+  logical :: fex1,fex2,gotit
   !
   ! Do some checks
   !
@@ -5812,8 +5881,13 @@ subroutine set_camera_frequencies(nfr,freq1,freq2)
      !
      ! Now make decisions where to get our frequency grid from
      !
+     gotit = .false.
      if((camera_lambdamic.gt.0.d0).and.(camera_lambdamic1.gt.0.d0).and. &
           (camera_range_nlam.gt.1)) then
+        if(gotit) then
+           write(stdo,*) 'ERROR: You try to use two methods for setting the camera wavelengths.'
+           stop
+        endif
         !
         ! Make a simple regular grid between lambdamic and lambdamic1
         ! using logarithmic spacing
@@ -5830,8 +5904,14 @@ subroutine set_camera_frequencies(nfr,freq1,freq2)
                 (camera_lambdamic1/camera_lambdamic)**               &
                 ((inu-1.d0)/(camera_nrfreq-1.d0)) )
         enddo
+        gotit = .true.
         !
-     elseif(camera_lambdamic.gt.0.d0) then
+     endif
+     if(camera_lambdamic.gt.0.d0) then
+        if(gotit) then
+           write(stdo,*) 'ERROR: You try to use two methods for setting the camera wavelengths.'
+           stop
+        endif
         !
         ! Use exactly this wavelength, given on the command line
         !
@@ -5843,8 +5923,14 @@ subroutine set_camera_frequencies(nfr,freq1,freq2)
            stop 
         endif
         camera_frequencies(1) = 1d4*cc/camera_lambdamic
+        gotit = .true.
         !
-     elseif(camera_theinu.gt.0) then
+     endif
+     if(camera_theinu.gt.0) then
+        if(gotit) then
+           write(stdo,*) 'ERROR: You try to use two methods for setting the camera wavelengths.'
+           stop
+        endif
         !
         ! Use one of the global frequency array frequencies, selected
         ! on the command line
@@ -5858,10 +5944,16 @@ subroutine set_camera_frequencies(nfr,freq1,freq2)
            stop 
         endif
         camera_frequencies(1) = freq_nu(camera_theinu)
+        gotit = .true.
         !
-     elseif((lines_user_nrfreq.ge.1).and. &
+     endif
+     if((lines_user_nrfreq.ge.1).and. &
         (lines_user_ispec.gt.0).and.(lines_user_iline.gt.0).and.        &
         rt_incl_lines) then
+        if(gotit) then
+           write(stdo,*) 'ERROR: You try to use two methods for setting the camera wavelengths.'
+           stop
+        endif
         !
         ! Use the line user-parameters to set the frequency grid 
         !
@@ -5911,7 +6003,13 @@ subroutine set_camera_frequencies(nfr,freq1,freq2)
            camera_frequencies(1) = lines_nu0(lines_user_iline,lines_user_ispec) * &
                 (1.d0-lines_user_kms0*1d5/cc)
         endif
-     elseif(camera_loadlambdas) then
+        gotit = .true.
+     endif
+     if(camera_loadlambdas) then
+        if(gotit) then
+           write(stdo,*) 'ERROR: You try to use two methods for setting the camera wavelengths.'
+           stop
+        endif
         !
         ! Read frequencies / wavelengths from a file
         !
@@ -5953,7 +6051,13 @@ subroutine set_camera_frequencies(nfr,freq1,freq2)
            write(stdo,*) '       camera_frequency.inp file.'
            stop
         endif
-     elseif(camera_loadcolor) then
+        gotit = .true.
+     endif
+     if(camera_loadcolor) then
+        if(gotit) then
+           write(stdo,*) 'ERROR: You try to use two methods for setting the camera wavelengths.'
+           stop
+        endif
         !
         ! Use a subset of wavelengths from the global frequency array
         !
@@ -5994,7 +6098,13 @@ subroutine set_camera_frequencies(nfr,freq1,freq2)
            camera_frequencies(i) = freq_nu(inu)
         enddo
         close(1)
-     elseif(camera_setfreq_global) then
+        gotit = .true.
+     endif
+     if(camera_setfreq_global) then
+        if(gotit) then
+           write(stdo,*) 'ERROR: You try to use two methods for setting the camera wavelengths.'
+           stop
+        endif
         !
         ! Use the global frequency array
         !
@@ -6008,7 +6118,9 @@ subroutine set_camera_frequencies(nfr,freq1,freq2)
         do inu=1,camera_nrfreq
            camera_frequencies(inu) = freq_nu(inu)
         enddo
-     else
+        gotit = .true.
+     endif
+     if(.not.gotit) then
         write(stdo,*) 'ERROR: No method specified for determining the wavelength grid'
         write(stdo,*) '       of the camera module. Use, on the command line, one of the following:'
         write(stdo,*) '          inu or ilambda followed by an integer'
@@ -7111,7 +7223,17 @@ subroutine camera_make_circ_image()
            !
            ! Then call the subroutine
            !
-           call sources_compute_snualphanu_at_vertices(inu0,camera_stokesvector)
+           if(igrid_type.lt.100) then
+              !
+              ! Regular or AMR type grid
+              !
+              call sources_compute_snualphanu_at_vertices(inu0,camera_stokesvector)
+           else
+              !
+              ! Unstructured grid
+              !
+              call sources_ugrid_compute_snualphanu_at_vertices(inu0,camera_stokesvector)
+           endif
         endif
         !
         ! Now make the image for this wavelength only

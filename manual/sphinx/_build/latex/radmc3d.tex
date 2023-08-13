@@ -73,7 +73,7 @@
 
 
 \title{radmc3d}
-\date{May 06, 2021}
+\date{Jan 29, 2022}
 \release{2.0}
 \author{Cornelis Dullemond}
 \newcommand{\sphinxlogo}{\vbox{}}
@@ -120,10 +120,8 @@ are marked with {[}\sphinxhyphen{}{]}. Those that are currently being developed 
 \sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
 \item {} 
 Coordinate systems:
-
-\end{enumerate}
 \begin{enumerate}
-\sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
+\sphinxsetlistlabels{\arabic}{enumii}{enumiii}{}{.}%
 \item {} 
 {[}+{]} Cartesian coordinates (3\sphinxhyphen{}D)
 
@@ -131,15 +129,12 @@ Coordinate systems:
 {[}+{]} Spherical coordinates (1\sphinxhyphen{}D, 2\sphinxhyphen{}D and 3\sphinxhyphen{}D)
 
 \end{enumerate}
-\begin{enumerate}
-\sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
+
 \item {} 
 Gridding systems (regular and adaptive mesh refinement grids are
 available for cartesian \sphinxstyleemphasis{and} spherical coordinates):
-
-\end{enumerate}
 \begin{enumerate}
-\sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
+\sphinxsetlistlabels{\arabic}{enumii}{enumiii}{}{.}%
 \item {} 
 {[}+{]} Regular
 
@@ -150,14 +145,18 @@ available for cartesian \sphinxstyleemphasis{and} spherical coordinates):
 {[}+{]} Adaptive Mesh Refinement: layered (‘patch’) style
 
 \item {} 
-{[}\sphinxhyphen{}{]} Voronoi gridding \sphinxstyleemphasis{{[}To be implemented on request{]}}
+{[}+{]} Delaunay gridding
+
+\item {} 
+{[}+{]} Voronoi gridding
+
+\item {} 
+{[}+{]} Flexible unstructured gridding
 
 \end{enumerate}
-\begin{enumerate}
-\sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
+
 \item {} 
 Radiation mechanisms:
-\begin{quote}
 \begin{enumerate}
 \sphinxsetlistlabels{\arabic}{enumii}{enumiii}{}{.}%
 \item {} 
@@ -165,10 +164,8 @@ Radiation mechanisms:
 
 \item {} 
 {[}+{]} Dust continuum scattering:
-
-\end{enumerate}
 \begin{enumerate}
-\sphinxsetlistlabels{\arabic}{enumii}{enumiii}{}{.}%
+\sphinxsetlistlabels{\arabic}{enumiii}{enumiv}{}{.}%
 \item {} 
 {[}+{]} …in isotropic approximation
 
@@ -179,8 +176,7 @@ Radiation mechanisms:
 {[}+{]} …with full Stokes and Polarization
 
 \end{enumerate}
-\begin{enumerate}
-\sphinxsetlistlabels{\arabic}{enumii}{enumiii}{}{.}%
+
 \item {} 
 {[}\sphinxhyphen{}{]} Dust quantum heated grains \sphinxstyleemphasis{{[}To be implemented on request{]}}
 
@@ -206,7 +202,6 @@ Radiation mechanisms:
 {[}+{]} Gas continuum opacity and emissivity sources
 
 \end{enumerate}
-\end{quote}
 
 \item {} 
 Radiation netto sources for continuum:
@@ -292,7 +287,9 @@ Front\sphinxhyphen{}end Python packages:
 
 \end{enumerate}
 
-\item {} \begin{enumerate}
+\item {} 
+Miscellaneous:
+\begin{enumerate}
 \sphinxsetlistlabels{\arabic}{enumii}{enumiii}{}{.}%
 \item {} 
 {[}+{]} Stars can be treated as point\sphinxhyphen{}sources or as spheres
@@ -313,7 +310,7 @@ Front\sphinxhyphen{}end Python packages:
 The RADMC\sphinxhyphen{}3D software package in under continuous development. A very
 detailed development log\sphinxhyphen{}book is found in the git repository.
 A more user\sphinxhyphen{}friendly overview of the development history can be
-found in this manual, in appendix ref\{chap\sphinxhyphen{}development\sphinxhyphen{}history\}.
+found in this manual, in appendix \hyperref[\detokenize{versiontracker:chap-development-history}]{Section \ref{\detokenize{versiontracker:chap-development-history}}}.
 
 
 \section{Copyright}
@@ -410,6 +407,9 @@ Blake Hord
 
 \item {} 
 Tilman Birnstiel
+
+\item {} 
+Uma Gorti
 
 \end{itemize}
 
@@ -1106,7 +1106,7 @@ distribution, you could do this:
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 \PYG{k+kn}{from} \PYG{n+nn}{radmc3dPy} \PYG{k}{import} \PYG{n}{analyze}
-\PYG{n}{d} \PYG{o}{=} \PYG{n}{readData}\PYG{p}{(}\PYG{n}{ddens}\PYG{o}{=}\PYG{k+kc}{True}\PYG{p}{)}
+\PYG{n}{d} \PYG{o}{=} \PYG{n}{analyze}\PYG{o}{.}\PYG{n}{readData}\PYG{p}{(}\PYG{n}{ddens}\PYG{o}{=}\PYG{k+kc}{True}\PYG{p}{)}
 \end{sphinxVerbatim}
 
 The \sphinxcode{\sphinxupquote{d.rhodust}} array now contains the dust density.
@@ -1589,7 +1589,7 @@ When using spherical coordinates, please read Section
 
 In all cases these structured grids allow for oct\sphinxhyphen{}tree\sphinxhyphen{}style grid refinement, or
 its simplified version: the layer\sphinxhyphen{}style grid refinement. See Section
-{\hyperref[\detokenize{inputoutputfiles:sec-grid-input}]{\sphinxcrossref{\DUrole{std,std-ref}{INPUT (required): amr\_grid.inp}}}} and Chapter {\hyperref[\detokenize{gridding:chap-gridding}]{\sphinxcrossref{\DUrole{std,std-ref}{More information about the gridding}}}} for more information
+{\hyperref[\detokenize{inputoutputfiles:sec-grid-input}]{\sphinxcrossref{\DUrole{std,std-ref}{INPUT (required): amr\_grid.inp or unstr\_grid.inp}}}} and Chapter {\hyperref[\detokenize{gridding:chap-gridding}]{\sphinxcrossref{\DUrole{std,std-ref}{More information about the gridding}}}} for more information
 about the gridding and the (adaptive) mesh refinement (AMR).
 
 
@@ -1685,7 +1685,7 @@ you have to tell RADMC\sphinxhyphen{}3D what the average densities of dust and/o
 these cells.
 
 The structure of the grid is specified in a file \sphinxcode{\sphinxupquote{amr\_grid.inp}} (see Section
-{\hyperref[\detokenize{inputoutputfiles:sec-grid-input}]{\sphinxcrossref{\DUrole{std,std-ref}{INPUT (required): amr\_grid.inp}}}}). All the other data, such as dust density and/or gas
+{\hyperref[\detokenize{inputoutputfiles:sec-grid-input}]{\sphinxcrossref{\DUrole{std,std-ref}{INPUT (required): amr\_grid.inp or unstr\_grid.inp}}}}). All the other data, such as dust density and/or gas
 density are specified in other files, but all assume that the grid is given by
 \sphinxcode{\sphinxupquote{amr\_grid.inp}}.
 
@@ -2186,7 +2186,7 @@ or {\hyperref[\detokenize{dustradtrans:sec-dust-ray-tracing}]{\sphinxcrossref{\D
 data:
 \begin{itemize}
 \item {} 
-\sphinxcode{\sphinxupquote{amr\_grid.inp}}: The grid file (see Section {\hyperref[\detokenize{inputoutputfiles:sec-grid-input}]{\sphinxcrossref{\DUrole{std,std-ref}{INPUT (required): amr\_grid.inp}}}}).
+\sphinxcode{\sphinxupquote{amr\_grid.inp}}: The grid file (see Section {\hyperref[\detokenize{inputoutputfiles:sec-grid-input}]{\sphinxcrossref{\DUrole{std,std-ref}{INPUT (required): amr\_grid.inp or unstr\_grid.inp}}}}).
 
 \item {} 
 \sphinxcode{\sphinxupquote{wavelength\_micron.inp}}: The global wavelength file (see Section
@@ -2211,7 +2211,7 @@ density distributions: one density distribution for each dust species.
 \item {} 
 \sphinxcode{\sphinxupquote{dustkappa\_XXX.inp}}: One or more dust opacity files (where \sphinxcode{\sphinxupquote{XXX}} should in
 fact be a tag name you define, for instance \sphinxcode{\sphinxupquote{dustkappa\_silicate.inp}}). The
-labels are listed in the \sphinxcode{\sphinxupquote{dustopac.inp}} file. ee Section
+labels are listed in the \sphinxcode{\sphinxupquote{dustopac.inp}} file. See Section
 {\hyperref[\detokenize{inputoutputfiles:sec-opacities}]{\sphinxcrossref{\DUrole{std,std-ref}{INPUT (required for dust transfer): dustopac.inp and dustkappa\_*.inp or dustkapscatmat\_*.inp or dust\_optnk\_*.inp}}}} for more information.
 
 \item {} 
@@ -2808,6 +2808,43 @@ with full scattering and single scattering you can estimate how important the
 multiple\sphinxhyphen{}scattering contribution is compared to single scattering. But of
 course, it is always safer to simply increase \sphinxcode{\sphinxupquote{nphot\_scat}} and patiently wait
 until the Monte Carlo run is finished.
+
+
+\subsubsection{Tip: Analyzing the effect of multiple scattering using \sphinxstyleliteralintitle{\sphinxupquote{selectscat}}}
+\label{\detokenize{dustradtrans:tip-analyzing-the-effect-of-multiple-scattering-using-selectscat}}\label{\detokenize{dustradtrans:sec-select-scattering}}
+If you are interested in analyzing the role that multiple scattering plays in your
+image (as opposed to single scattering), you can ask RADMC\sphinxhyphen{}3D to compute the
+scattering source function only for, for instance, the second scattering:
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{radmc3d} \PYG{n}{image} \PYG{k}{lambda} \PYG{l+m+mf}{1.0} \PYG{n}{selectscat} \PYG{l+m+mi}{2} \PYG{l+m+mi}{2}
+\end{sphinxVerbatim}
+
+Note that this should not be used for production runs, because the image that
+is produced is unphysical (it omits the first and third, fourth etc scatterings).
+But it can be useful to get a feeling for how important multiple scattering
+is, or to investigate if certain features in your image are due to multiple
+scattering or not. You can also select only the first scattering:
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{radmc3d} \PYG{n}{image} \PYG{k}{lambda} \PYG{l+m+mf}{1.0} \PYG{n}{selectscat} \PYG{l+m+mi}{1} \PYG{l+m+mi}{1}
+\end{sphinxVerbatim}
+
+or all scatterings except the first:
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{radmc3d} \PYG{n}{image} \PYG{k}{lambda} \PYG{l+m+mf}{1.0} \PYG{n}{selectscat} \PYG{l+m+mi}{2} \PYG{l+m+mi}{100000}
+\end{sphinxVerbatim}
+
+Note that if you make an image with \sphinxcode{\sphinxupquote{selectscat}}, the thermal emission from
+the dust is still included (as is the case without \sphinxcode{\sphinxupquote{selectscat}}). So if
+you want to see \sphinxstyleemphasis{only} the scattered light in the image, you need to manually
+set the dust temperature to zero everywhere (in the file \sphinxcode{\sphinxupquote{dust\_temperature.dat}},
+see Chapter {\hyperref[\detokenize{inputoutputfiles:chap-input-files}]{\sphinxcrossref{\DUrole{std,std-ref}{Main input and output files of RADMC\sphinxhyphen{}3D}}}}).
+
+Also note that you can use \sphinxcode{\sphinxupquote{selectscat}} also for the monochromatic
+Monte Carlo for computing the mean intensity field
+(see Section {\hyperref[\detokenize{dustradtrans:sec-dust-monochromatic-monte-carlo}]{\sphinxcrossref{\DUrole{std,std-ref}{Special\sphinxhyphen{}purpose feature: Computing the local radiation field}}}}).
 
 
 \subsection{Simplified single\sphinxhyphen{}scattering mode (spherical coordinates)}
@@ -3568,7 +3605,7 @@ adjust the signs.
 In spherical coordinates it is possible in RADMC\sphinxhyphen{}3D to set up axially symmetric
 models. The trick is simply to set the number of \(\phi\) coordinate points
 \sphinxcode{\sphinxupquote{nphi}} to 1 and to switch off the \(\phi\)\sphinxhyphen{}dimension in the grid (see
-Section {\hyperref[\detokenize{inputoutputfiles:sec-grid-input}]{\sphinxcrossref{\DUrole{std,std-ref}{INPUT (required): amr\_grid.inp}}}}). For isotropic scattering this mode has always
+Section {\hyperref[\detokenize{inputoutputfiles:sec-grid-input}]{\sphinxcrossref{\DUrole{std,std-ref}{INPUT (required): amr\_grid.inp or unstr\_grid.inp}}}}). For isotropic scattering this mode has always
 been implemented. But for anisotropic scattering things become more complex. For
 such a model the scattering remains a fully 3\sphinxhyphen{}D problem: the scattering source
 function has to be stored not only as a function of \(r\) and
@@ -4286,6 +4323,177 @@ emission.
 \label{\detokenize{dustradtrans:effect-of-aligned-grains-on-the-scattering}}\label{\detokenize{dustradtrans:sec-align-scat}}
 \sphinxstyleemphasis{This is, currently, not yet implemented.}
 
+
+\section{Grain size distributions}
+\label{\detokenize{dustradtrans:grain-size-distributions}}\label{\detokenize{dustradtrans:sec-grain-size-distributions}}
+
+\subsection{Quick summary of how to implement grain sizes}
+\label{\detokenize{dustradtrans:quick-summary-of-how-to-implement-grain-sizes}}\label{\detokenize{dustradtrans:sec-grain-size-distributions-overview}}
+A common application of RADMC\sphinxhyphen{}3D is continuum radiative transfer in media with a
+grain size distribution. RADMC\sphinxhyphen{}3D does not know the concept of “grain size
+distribution”, and it does not care. You have to provide RADMC\sphinxhyphen{}3D will all the
+information it needs, such that it will handle the dust size distribution you
+want. All the responsibility lies with you, the user.
+
+There are basically two ways by which you can make RADMC\sphinxhyphen{}3D treat a grain size
+distribution:
+\begin{itemize}
+\item {} 
+Method 1: Mixing the dust opacities into a single opacity file, having
+RADMC\sphinxhyphen{}3D think that there is only one dust species. Fast and simple.
+
+\item {} 
+Method 2: Computing \(N\) dust opacity files, having \(N\) independent
+dust species. Slower but more realistic and flexible.
+
+\end{itemize}
+
+In the following subsections we will discuss both methods.
+
+
+\subsection{Method 1: Size distribution in the opacity file (faster)}
+\label{\detokenize{dustradtrans:method-1-size-distribution-in-the-opacity-file-faster}}\label{\detokenize{dustradtrans:sec-grain-size-distributions-method-1}}
+The simplest way is to compute a single dust opacity table (see Section
+{\hyperref[\detokenize{inputoutputfiles:sec-opacities}]{\sphinxcrossref{\DUrole{std,std-ref}{INPUT (required for dust transfer): dustopac.inp and dustkappa\_*.inp or dustkapscatmat\_*.inp or dust\_optnk\_*.inp}}}}) for a single dust species. You compute the weighted dust
+opacity and put that into the file \sphinxcode{\sphinxupquote{dustkappa\_XXX.inp}} (for instance let’s
+call it \sphinxcode{\sphinxupquote{dustkappa\_sizedistrib.inp}}) or \sphinxcode{\sphinxupquote{dustkapscatmat\_XXX.inp}} (for
+instance let’s call it \sphinxcode{\sphinxupquote{dustkapscatmat\_sizedistrib.inp}}).  All the information
+about the size distribution shape is then encoded in this opacity file, and
+RADMC\sphinxhyphen{}3D will never know that it is, in fact, a size distribution. The file
+\sphinxcode{\sphinxupquote{dust\_density.inp}} will then only contain the spatial distribution of a single
+grain species: that of the mixture of sizes. Advantage: it is the
+easiest. Disadvantage: the size distribution will be identical
+everywhere. Another disadvantage: each grain size will have the same temperature
+(because RADMC\sphinxhyphen{}3D does not know that these are different dust sizes).
+
+This method be useful to save computer time. You essentially do all the work of
+computing the opacity of the size distribution beforehand (even before you start
+RADMC\sphinxhyphen{}3D), so that you get a single opacity file that already contains the
+size\sphinxhyphen{}distribution\sphinxhyphen{}weighted opacities. You must then be sure that you do the
+weighting such that the opacity is “cross section per gram of dust”, where
+“dust” is already the entire grain size distribution. The dust density in the
+\sphinxcode{\sphinxupquote{dust\_density.inp}} file must then also be the density of the entire grain size
+distribution. See Section {\hyperref[\detokenize{dustradtrans:sec-math-of-grain-size-distributions}]{\sphinxcrossref{\DUrole{std,std-ref}{The mathematics of grain size distributions}}}} for more
+information about size distributions.
+
+
+\subsection{Method 2: Size distribution in the density file (better)}
+\label{\detokenize{dustradtrans:method-2-size-distribution-in-the-density-file-better}}\label{\detokenize{dustradtrans:sec-grain-size-distributions-method-2}}
+RADMC\sphinxhyphen{}3D can handle multiple dust species simultaneously and co\sphinxhyphen{}spatially. So
+you can have \(N\) grain sizes, each represented by its own opacity file and
+its own spatial density distribution. So if we, for example, have two sizes, 1
+micron and 1 millimeter (i.e. \(N=2\)) then we would have, for instance, two
+opacity files, \sphinxcode{\sphinxupquote{dustkappa\_1micron.inp}} and \sphinxcode{\sphinxupquote{dustkappa\_1mm.inp}} (don’t forget
+to mark them both in \sphinxcode{\sphinxupquote{dustopac.inp}} too), and within the \sphinxcode{\sphinxupquote{dust\_density.inp}}
+file we have two density fields. This allows you, for instance, to have the
+large grains near the midplane of a disk and the small grains vertically more
+extended, because you can determine the density \(\rho\) of each dust
+species completely independent from the others.
+
+We have now two choices how to handle these species: (a) thermally coupled (set
+\sphinxcode{\sphinxupquote{itempdecoup = 0}} in \sphinxcode{\sphinxupquote{radmc3d.inp}}, see section {\hyperref[\detokenize{inputoutputfiles:sec-radmc-inp}]{\sphinxcrossref{\DUrole{std,std-ref}{INPUT: radmc3d.inp}}}}, or (b)
+thermally decoupled (default, but you can set \sphinxcode{\sphinxupquote{itempdecoup = 1}} in
+\sphinxcode{\sphinxupquote{radmc3d.inp}} to make sure). The default is thermally decoupled, because that
+is for most cases more realistic. If the grains are thermally decoupled, then,
+in the optically thin regions exposed to hot stellar radiation, the small grains
+tend to be hotter than the large ones. However, in optically thick regions the
+small and large grains will tend to automatically acquire similar or the same
+temperature(s).
+
+Compared to the first method (with a single dust species), this method is more
+flexible (allowing different spatial distributions for different grain sizes)
+but also more costly (requiring the radiative transfer code to handle the
+interaction of the radiation with \(N\) independent dust species). You must
+then calculate each grain opacity file separately, and keep these normalized to
+“cross section per gram of this particular dust species or size”. Here, the
+weighting is not done in the opacity files, but in the fact that each grain size
+(or species) \(i\) has its own density \(\rho_i\). You would then need
+to make sure that these \(\rho_i\) are following the size distribution you
+wish. See Section {\hyperref[\detokenize{dustradtrans:sec-math-of-grain-size-distributions}]{\sphinxcrossref{\DUrole{std,std-ref}{The mathematics of grain size distributions}}}} for more
+information about size distributions.
+
+
+\subsection{The mathematics of grain size distributions}
+\label{\detokenize{dustradtrans:the-mathematics-of-grain-size-distributions}}\label{\detokenize{dustradtrans:sec-math-of-grain-size-distributions}}
+Grain size distributions can be confusing, so here is a small tutorial.
+Suppose we have the famous MRN (Mathis, Rumpl, Nordsieck) size distribution:
+\begin{equation*}
+\begin{split}n(a)da \propto a^{-7/2}da\end{split}
+\end{equation*}
+with \(a\) the radius of the grain, \(n(a)da\) the number of grains
+between sizes \(a\) and \(a+da\) per volume. We say that this
+powerlaw goes from \(a=a_{\mathrm{min}}\) to \(a=a_{\mathrm{max}}\),
+and we keep in mind that \(a_{\mathrm{max}}\) can be (but does not
+have to) orders of magnitude larger than \(a_{\mathrm{min}}\).
+The total dust density \(\rho\) is:
+\begin{equation*}
+\begin{split}\rho = \int_{a_{\mathrm{min}}}^{a_{\mathrm{max}}} m(a)n(a)da\end{split}
+\end{equation*}
+where \(m(a)\) is the mass of the grain:
+\begin{equation*}
+\begin{split}m(a) = \rho_s \frac{4\pi}{3}a^3\end{split}
+\end{equation*}
+where \(\rho_s\) is the material density of the grain material (typically
+somewhere between 1 and 3.6 \(\mathrm{gram}/\mathrm{cm}^3\), dependent on the material).
+
+For RADMC\sphinxhyphen{}3D we have to disretize this into \(N\) bins. Since we can have
+\(a_{\mathrm{max}}\gg a_{\mathrm{min}}\), it is best to take a logarithmic
+grid in \(a\), i.e. equal spacing in \(\ln(a)\).  So we divide the
+interval \([\ln(a_{\mathrm{min}}),\ln(a_{\mathrm{max}})]\) up into \(N\)
+equal size bins, numbering \(i=0\) to \(i=N-1\), with cell centers
+denoted as \(\ln(a_i)\) and the cell walls are denoted as
+\(\ln(a_{i-1/2})\) for the left\sphinxhyphen{} and \(\ln(a_{i+1/2})\) for the
+right\sphinxhyphen{}hand cell wall. We have \(\ln(a_{-1/2})=\ln(a_{\mathrm{min}})\) and
+\(\ln(a_{N-1/2})=\ln(a_{\mathrm{max}})\). For any \(i\) we have the same
+cell width in log\sphinxhyphen{}space:
+\(\Delta\ln(a)=\Delta\ln(a_i)=\ln(a_{i+1/2})-\ln(a_{i-1/2})\).
+Now the density for each bin is:
+\begin{equation*}
+\begin{split}\rho_i = \int_{a_{i-1/2}}^{a_{i+1/2}} m(a)\,n(a)\,da = \int_{\ln(a_{i-1/2})}^{\ln(a_{i+1/2})} a\,m(a)\,n(a)\,d\ln(a)\end{split}
+\end{equation*}
+If the bin width \(\Delta\ln(a)\) is small enough, this can be approximated
+as
+\begin{equation*}
+\begin{split}\rho_i \simeq a_i m(a_i)n(a_i)\Delta\ln(a)\end{split}
+\end{equation*}
+The total dust density is then
+\begin{equation*}
+\begin{split}\rho = \sum_{i=0}^{N-1} \rho_i\end{split}
+\end{equation*}
+The opacity for bin \(i\) at some frequency \(\nu\) is approximately \(\kappa_\nu(a_i)\)
+if a small enough bin size is used. That means that the extinction coefficient
+\begin{equation*}
+\begin{split}\alpha_\nu = \sum_{i=0}^{N-1} \rho_i\kappa_\nu(a_i)\end{split}
+\end{equation*}
+In method 2 (Section {\hyperref[\detokenize{dustradtrans:sec-grain-size-distributions-method-2}]{\sphinxcrossref{\DUrole{std,std-ref}{Method 2: Size distribution in the density file (better)}}}}) this is exactly what happens:
+you specify \(N\) tables of \(\kappa_\nu(a_i)\) (each table containing all frequencies
+for which you want to use the opacity), and the “mixing” happens in each grid cell on\sphinxhyphen{}the\sphinxhyphen{}fly
+depending on the local values of \(\rho_i\). The values of \(\rho_i\) in the file
+\sphinxcode{\sphinxupquote{dust\_density.inp}} are exactly these \(\rho_i\).
+
+On the contrary, in method 1 (Section {\hyperref[\detokenize{dustradtrans:sec-grain-size-distributions-method-1}]{\sphinxcrossref{\DUrole{std,std-ref}{Method 1: Size distribution in the opacity file (faster)}}}}), you compute
+a nomalized \(\hat n(a_i)\) such that
+\begin{equation*}
+\begin{split}\sum_{i=0}^{N-1}  a_i m(a_i)\hat n(a_i)\Delta\ln(a) = 1\end{split}
+\end{equation*}
+so that with
+\begin{equation*}
+\begin{split}\hat\rho_i \simeq a_i m(a_i)\hat n(a_i)\Delta\ln(a)\end{split}
+\end{equation*}
+we get
+\begin{equation*}
+\begin{split}\sum_{i=0}^{N-1}  \hat\rho_i = 1\end{split}
+\end{equation*}
+Now we can compute a grain\sphinxhyphen{}size\sphinxhyphen{}mean opacity:
+\begin{equation*}
+\begin{split}\hat\kappa_\nu = \sum_{i=0}^{N-1} \hat\rho_i\kappa_\nu(a_i)\end{split}
+\end{equation*}
+which is computed before running RADMC\sphinxhyphen{}3D, and will be valid at all locations in the spatial grid.
+At each cell we only have the total dust density \(\rho\). The extinction coefficient is
+then
+\begin{equation*}
+\begin{split}\alpha_\nu = \rho\hat\kappa_\nu\end{split}
+\end{equation*}
 
 \chapter{Line radiative transfer}
 \label{\detokenize{lineradtrans:line-radiative-transfer}}\label{\detokenize{lineradtrans:chap-line-transfer}}\label{\detokenize{lineradtrans::doc}}
@@ -7565,7 +7773,7 @@ photons will change for different wavelengths, even with the same initial seed.
 \label{\detokenize{gridding:more-information-about-the-gridding}}\label{\detokenize{gridding:chap-gridding}}\label{\detokenize{gridding::doc}}
 We already discussed the various types of grids in Section
 {\hyperref[\detokenize{basicstructure:sec-spatial-grid}]{\sphinxcrossref{\DUrole{std,std-ref}{The spatial grid}}}}, and the grid input file structure is described in
-Section {\hyperref[\detokenize{inputoutputfiles:sec-grid-input}]{\sphinxcrossref{\DUrole{std,std-ref}{INPUT (required): amr\_grid.inp}}}}. In this chapter let us take a closer look
+Section {\hyperref[\detokenize{inputoutputfiles:sec-grid-input}]{\sphinxcrossref{\DUrole{std,std-ref}{INPUT (required): amr\_grid.inp or unstr\_grid.inp}}}}. In this chapter let us take a closer look
 at the gridding possibilities and things to take special care of.
 
 
@@ -7925,10 +8133,147 @@ our ‘successively regular’ kind of data format is more of an advantage than 
 6.25\% redundance is a disadvantage.
 
 
-\section{Unstructured grids}
-\label{\detokenize{gridding:unstructured-grids}}\label{\detokenize{gridding:sec-unstruct-grids}}
-In a future version of RADMC\sphinxhyphen{}3D we will include unstructured gridding as a
-possibility. But at this moment such a gridding is not yet implemented.
+\section{Unstructured grids (Delaunay, Voronoi, or more general)}
+\label{\detokenize{gridding:unstructured-grids-delaunay-voronoi-or-more-general}}\label{\detokenize{gridding:sec-unstruct-grids}}
+RADMC\sphinxhyphen{}3D can handle unstructures grids of a variety of types. This works (so
+far) only for 3\sphinxhyphen{}D cartesian coordinates. The two most well\sphinxhyphen{}known are Delaunay
+grids and Voronoi grids. But these are just special cases of a more general
+unstructured grid capability. RADMC\sphinxhyphen{}3D only needs to know, for each grid cell:
+\begin{enumerate}
+\sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
+\item {} 
+The volume of the cell
+
+\item {} 
+The cell walls of the cell
+
+\end{enumerate}
+
+and, conversely, for each cell wall which two cells that the wall separates.  A
+cell wall is only defined by two vectors that define the 2D plane in 3D space: a
+support vector \({\bf s}\) and a normal vector \({\bf n}\). By giving to
+RADMC\sphinxhyphen{}3D a file \sphinxcode{\sphinxupquote{unstr\_grid.inp}} containing all this information, the user determines
+the shape of each cell. Each of these cells has an integer index, starting with
+1, and increasing by steps of 1 until the number of cells. The density and other
+variables in the usual input files such as \sphinxcode{\sphinxupquote{dust\_density.inp}} are then associated
+to these cells in that order (first value belongs to cell 1, second to cell 2 etc).
+
+This information is enough for RADMC\sphinxhyphen{}3D to compute where a ray passes from one
+cell to its neighbor, and how the passage through the cell affects the cell’s
+temperature and scattering source function.
+
+Some of this grid information is redundant, and depends on which information
+is contained in \sphinxcode{\sphinxupquote{unstr\_grid.inp}}. Typically the user provides only the information
+about the grid he/she wants to provide, and RADMC\sphinxhyphen{}3D will try to complete the rest
+if it can (otherwise it will give an error).
+
+For example: For a Voronoi grid you only need to specify, for each cell wall,
+which two cells the wall separates. If RADMC\sphinxhyphen{}3D lacks further information, it
+will by default assume that the cell walls lie exactly in between the two cell
+center points and perpendicular to the line connecting them, thus naturally
+giving you a Voronoi grid. The support vectors and normal vectors of the walls are then
+computed internally in RADMC\sphinxhyphen{}3D. Unfortunately, RADMC\sphinxhyphen{}3D lacks the capability to
+calculate the cell volumes for Voronoi cells, so you will have to provide the
+cell volume.
+
+As another example: For a Delaunay grid you only need to specify the vertices
+(corner points of the tetraheders), which vertices span a wall, and which two
+cells the wall separates (or one cell and the vacuum). The support vectors and
+normal vectors of the walls are then computed internally in RADMC\sphinxhyphen{}3D.
+For these simple shaped cells (just simplices) RADMC\sphinxhyphen{}3D can calculate the volume
+itself.
+
+Computing this information for a Delaunay or Voronoi grid can be done using
+external software packages such as \sphinxcode{\sphinxupquote{qhull}}. In fact, the \sphinxcode{\sphinxupquote{qhull}} package
+is built\sphinxhyphen{}in into the \sphinxcode{\sphinxupquote{scipy.spatial}} library of Python, and is thefore
+easily usable from within Python. To create the necessary \sphinxcode{\sphinxupquote{unstr\_grid.inp}}
+files using these libraries you can use the following tools provided with
+the RADMC\sphinxhyphen{}3D package:
+\begin{enumerate}
+\sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
+\item {} 
+\sphinxcode{\sphinxupquote{python/radmc3d\_tools/radmc3d\_delaunay\_grid.py}} : A tool to generate a
+Delaunay grid from a given set of vertex points. Note that the cells are
+then created by this tool, and they may not be the same (and almost certainly
+not in the same order) as the cells you may have assumed beforehand. So
+if you obtain a model from someone else that is on a Delaunay grid, and
+the physical values are in the grid cells, you may need to figure out how
+to associate the cells from that other model with the cells generated by
+this package. However, usually the physical values would, in the case of
+a Delaunay grid, be specified at the cell vertices. Then you would need
+to interpolate into the (new) cells, because RADMC\sphinxhyphen{}3D needs the physical
+values inside the cells, not at the vertices.
+
+\item {} 
+\sphinxcode{\sphinxupquote{python/radmc3d\_tools/radmc3d\_voronoi\_grid.py}} : A tool to generate
+a Voronoi grid from a given set of cell center points. The physical
+variables are also specified on these points. The vertex points are
+not required as input. Only needed is information about each cell wall:
+which two cells are divided by the wall, and information about each cell:
+it’s volume. In voronoi grids there will be ‘open cells’ which go out
+to infinity. The physical variables in these cells are ignored: These
+cells are assumed to be empty.
+
+\end{enumerate}
+
+\begin{figure}[htbp]
+\centering
+\capstart
+
+\noindent\sphinxincludegraphics[width=0.750\linewidth]{{delaunay_grid_2d}.pdf}
+\caption{Example of unstructured grid: a Delaunay grid. Figure is only symbolic, since
+the actual grid is 3D. Blue points are cell centers, orange points are
+vertices.}\label{\detokenize{gridding:id7}}\label{\detokenize{gridding:fig-delau}}\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\capstart
+
+\noindent\sphinxincludegraphics[width=0.750\linewidth]{{voronoi_grid_2d}.pdf}
+\caption{Example of unstructured grid: a Voronoi grid. Figure is only symbolic, since
+the actual grid is 3D. Blue points are cell centers, orange points are
+vertices.}\label{\detokenize{gridding:id8}}\label{\detokenize{gridding:fig-voronoi}}\end{figure}
+
+Examples of these two types of grids are shown in
+\hyperref[\detokenize{gridding:fig-delau}]{Fig.\@ \ref{\detokenize{gridding:fig-delau}}} and \hyperref[\detokenize{gridding:fig-voronoi}]{Fig.\@ \ref{\detokenize{gridding:fig-voronoi}}}.
+
+However, you can also generate your own grid designs by specifying the
+support vectors and normal vectors and two cells belonging to each wall.
+However, this is not an entirely trivial task to do correctly, because
+the result has to obey the following conditions:
+\begin{enumerate}
+\sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
+\item {} 
+Each cell must be convex in shape.
+
+\item {} 
+Beware not to forget any necessary wall. A missing wall will likely
+cause very unexpected behavior.
+
+\item {} 
+There should be no “empty holes” between the cells: inside the grid
+cells should fill space perfectly. This is not a trivial condition
+to fulfill: ill defined grid walls can lead to photons finding themselves
+outside a grid cell, but within the grid. This leads to RADMC\sphinxhyphen{}3D
+to crash.
+
+\item {} 
+If you specify the cell walls with vertices instead of support\sphinxhyphen{} and
+normal vectors, the vertices belonging to a cell must lie perfectly
+in same plane.
+
+\item {} 
+If you have walls that face the vacuum, they are part of what is called
+the hull of the grid (Note: A Delaunay grid has a hull, but a Voronoi
+grid does not: it has instead open cells). It is best (though not
+strictly necessary) to assure that the hull is convex, since that
+makes the code faster.
+
+\end{enumerate}
+
+The way to make your own (non\sphinxhyphen{}Delaunay, non\sphinxhyphen{}Voronoi) grid is to generate
+a file \sphinxcode{\sphinxupquote{unstr\_grid.inp}} in the appropriate way. The technical details
+how this file is formatted are given in Section {\hyperref[\detokenize{inputoutputfiles:sec-unstr-grid}]{\sphinxcrossref{\DUrole{std,std-ref}{Unstructured grid}}}}.
 
 
 \section{1\sphinxhyphen{}D Plane\sphinxhyphen{}parallel models}
@@ -7943,7 +8288,7 @@ thus have a 1\sphinxhyphen{}D grid in the \(z\)\sphinxhyphen{}coordinate, but no
 \(y\)\sphinxhyphen{}directions.
 
 You can make a 1\sphinxhyphen{}D plane\sphinxhyphen{}parallel model by setting some settings in the
-\sphinxcode{\sphinxupquote{amr\_grid.inp}} file. Please consult Section {\hyperref[\detokenize{inputoutputfiles:sec-grid-input}]{\sphinxcrossref{\DUrole{std,std-ref}{INPUT (required): amr\_grid.inp}}}} for the
+\sphinxcode{\sphinxupquote{amr\_grid.inp}} file. Please consult Section {\hyperref[\detokenize{inputoutputfiles:sec-grid-input}]{\sphinxcrossref{\DUrole{std,std-ref}{INPUT (required): amr\_grid.inp or unstr\_grid.inp}}}} for the
 format of this file. The changes/settings you have to do are (see example
 below): (1) set the coordinate type number to 10, (2) set the \(x\) and
 \(y\) dimensions to non\sphinxhyphen{}active and (3) setting the cell interfaces in
@@ -8904,7 +9249,7 @@ method. This is described in the README file in that package.
 
 
 \section{The simpleread.py library}
-\label{\detokenize{pythontools:the-simpleread-py-library}}
+\label{\detokenize{pythontools:the-simpleread-py-library}}\label{\detokenize{pythontools:sec-simpleread-tools}}
 For the most rudimentary analysis of the output (or input) files of RADMC\sphinxhyphen{}3D you
 can use the \sphinxcode{\sphinxupquote{simpleread.py}} file, which you can find in the \sphinxcode{\sphinxupquote{python/tools/}}
 directory. If everything has been installed correctly, you should be able to
@@ -8926,6 +9271,8 @@ Examples of data files you can read:
 \PYG{n}{d} \PYG{o}{=} \PYG{n}{read\PYGZus{}gasvelocity}\PYG{p}{(}\PYG{p}{)}
 \PYG{n}{d} \PYG{o}{=} \PYG{n}{read\PYGZus{}molnumdens}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{co}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
 \PYG{n}{d} \PYG{o}{=} \PYG{n}{read\PYGZus{}mollevelpop}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{co}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{d} \PYG{o}{=} \PYG{n}{read\PYGZus{}subbox}\PYG{p}{(}\PYG{n}{name}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{dust\PYGZus{}temperature}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{d} \PYG{o}{=} \PYG{n}{read\PYGZus{}subbox}\PYG{p}{(}\PYG{n}{name}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{dust\PYGZus{}density}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
 \end{sphinxVerbatim}
 
 Of course each one only if the corresponding file is present. Note that ‘co’ is
@@ -8963,6 +9310,10 @@ file support is included (though this may change), no AMR octree grids can be
 read, and several other limitations. For more sophisticated Python tools,
 use the radmc3dPy library.
 
+\sphinxstyleemphasis{Note:} For the \sphinxcode{\sphinxupquote{read\_subbox()}} function, you need to read the section
+on the creation of regular\sphinxhyphen{}gridded datacubes of your 3D model, which is
+Section {\hyperref[\detokenize{toolsinside:sec-subbox}]{\sphinxcrossref{\DUrole{std,std-ref}{Making a regularly\sphinxhyphen{}spaced datacube (‘subbox’) of AMR\sphinxhyphen{}based models}}}}.
+
 
 \section{The radmc3dPy library}
 \label{\detokenize{pythontools:the-radmc3dpy-library}}
@@ -8992,13 +9343,13 @@ way:
 \item {} 
 Make sure to start Python 3 using \{small ipython \textendash{}matplotlib\} if you start
 Python from the command line. If you instead use a Jupyter notebook, make
-sure that as a first line you use \sphinxcode{\sphinxupquote{\%matplotlibinline}} to get the plots
+sure that as a first line you use \sphinxcode{\sphinxupquote{\%matplotlib inline}} to get the plots
 inside the notebook. These are standard Python things, so if you have
 trouble, ask your python friends or system manager.
 
 \item {} 
 Once you are inside Python you can include \sphinxcode{\sphinxupquote{radmc3dPy}} using a simple
-\sphinxcode{\sphinxupquote{fromradmc3dPyimport*}}. This loads a series of radmc3dPy sub\sphinxhyphen{}libraries,
+\sphinxcode{\sphinxupquote{from radmc3dPy import *}}. This loads a series of radmc3dPy sub\sphinxhyphen{}libraries,
 including \sphinxcode{\sphinxupquote{analyze}}, \sphinxcode{\sphinxupquote{image}} and several others.
 
 \end{enumerate}
@@ -9017,7 +9368,7 @@ the RADMC\sphinxhyphen{}3D package, and post\sphinxhyphen{}process the results w
 
 To use one of the \sphinxcode{\sphinxupquote{radmc3dPy}}\sphinxhyphen{}internal models, create a directory
 (e.g. \sphinxcode{\sphinxupquote{mymodel}}), go into it, and go into iPython. Then type
-\sphinxcode{\sphinxupquote{fromradmc3dPyimport*}}. By typing \sphinxcode{\sphinxupquote{models.getModelNames()}} you get a list
+\sphinxcode{\sphinxupquote{from radmc3dPy import *}}. By typing \sphinxcode{\sphinxupquote{models.getModelNames()}} you get a list
 of available models. Suppose we choose the model ‘ppdisk’, then we would go
 about like this (for example):
 
@@ -9057,7 +9408,7 @@ And the image can be displayed (in Python) by
 No matter whether you use the \sphinxcode{\sphinxupquote{radmc3dPy}}\sphinxhyphen{}internal model set, or you create
 your own model setup, you can use the extensive tool set inside \sphinxcode{\sphinxupquote{radmc3dPy}} to
 analyze the model itself, and the results of RADMC\sphinxhyphen{}3D calculations. In
-everything below, we assume that you use \sphinxcode{\sphinxupquote{fromradmc3dPyimport*}} beforehand.
+everything below, we assume that you use \sphinxcode{\sphinxupquote{from radmc3dPy import *}} beforehand.
 
 
 \subsection{Read the \sphinxstyleliteralintitle{\sphinxupquote{amr\_grid.inp}} file}
@@ -9101,8 +9452,8 @@ possibility in \sphinxcode{\sphinxupquote{radmc3d}} to generate 1\sphinxhyphen{}
 the model.
 
 
-\subsection{Creating and reading a subbox}
-\label{\detokenize{toolsinside:creating-and-reading-a-subbox}}
+\subsection{Creating a subbox}
+\label{\detokenize{toolsinside:creating-a-subbox}}
 You can call \sphinxcode{\sphinxupquote{radmc3d}} directly from the shell asking it to make
 the subbox. Here is an example:
 
@@ -9113,9 +9464,14 @@ the subbox. Here is an example:
 which creates a regularly sampled 64x64x64 datacube of the dust density, with \(x\) grid
 between \(-2\times 10^{15}\;\mathrm{cm}\) and  \(+2\times 10^{15}\;\mathrm{cm}\) and
 likewise for \(y\) and \(z\) (note that these box boundaries are the walls of the
-regularly spaced cells of the subbox). For the dust temperature the command is
-\sphinxcode{\sphinxupquote{./radmc3d subbox\_dust\_temperature}}. You can also rotate the box along three angles:
-\(\phi_1\), \(\theta\), and \(\phi_2\), for example:
+regularly spaced cells of the subbox). The file that this creates is called \sphinxcode{\sphinxupquote{dust\_density\_subbox.out}}
+(see section {\hyperref[\detokenize{toolsinside:sec-subbox-file-format}]{\sphinxcrossref{\DUrole{std,std-ref}{Format of the subbox output files}}}} for the format of this file).
+For the dust temperature the command is
+\sphinxcode{\sphinxupquote{./radmc3d subbox\_dust\_temperature}}, in which case the file is called
+\sphinxcode{\sphinxupquote{dust\_temperature\_subbox.out}}.
+
+You can also rotate the box along three angles: \(\phi_1\), \(\theta\),
+and \(\phi_2\), for example:
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 \PYG{o}{.}\PYG{o}{/}\PYG{n}{radmc3d} \PYG{n}{subbox\PYGZus{}dust\PYGZus{}temperature} \PYG{n}{subbox\PYGZus{}nxyz} \PYG{l+m+mi}{64} \PYG{l+m+mi}{64} \PYG{l+m+mi}{64} \PYG{n}{subbox\PYGZus{}xyz01} \PYG{o}{\PYGZhy{}}\PYG{l+m+mf}{2.e15} \PYG{l+m+mf}{2.e15} \PYG{o}{\PYGZhy{}}\PYG{l+m+mf}{2.e15} \PYG{l+m+mf}{2.e15} \PYG{o}{\PYGZhy{}}\PYG{l+m+mf}{2.e15} \PYG{l+m+mf}{2.e15} \PYG{n}{subbox\PYGZus{}phi1} \PYG{l+m+mi}{30} \PYG{n}{subbox\PYGZus{}theta} \PYG{l+m+mi}{60}  \PYG{n}{subbox\PYGZus{}phi2} \PYG{l+m+mi}{45}
@@ -9145,7 +9501,7 @@ global array (and thus also for writing out to file).
 
 
 \subsection{Format of the subbox output files}
-\label{\detokenize{toolsinside:format-of-the-subbox-output-files}}
+\label{\detokenize{toolsinside:format-of-the-subbox-output-files}}\label{\detokenize{toolsinside:sec-subbox-file-format}}
 All the files produced by the subbox method have the following format:
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
@@ -9188,6 +9544,38 @@ levels 4 and 8 are in this file, then \sphinxcode{\sphinxupquote{nv=2}} and the 
 the identification numbers will be \sphinxcode{\sphinxupquote{48}}. For all other quantities
 (dust density, dust temperature) this line of identification numbers is simply
 \sphinxcode{\sphinxupquote{123}} etc.
+
+
+\subsection{Using the \sphinxstyleliteralintitle{\sphinxupquote{radmc3d\_tools}} to read the subbox data}
+\label{\detokenize{toolsinside:using-the-radmc3d-tools-to-read-the-subbox-data}}
+In Section {\hyperref[\detokenize{pythontools:sec-simpleread-tools}]{\sphinxcrossref{\DUrole{std,std-ref}{The simpleread.py library}}}} a set of simple Python tools are
+discussed to read a variety of output files from RADMC\sphinxhyphen{}3D (as well as input
+files to RADMC\sphinxhyphen{}3D) for further analysis.
+
+Also for the subbox output there is now a Python function to read those.
+Example: First run RADMC\sphinxhyphen{}3D:
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{radmc3d} \PYG{n}{mctherm}
+\PYG{n}{radmc3d} \PYG{n}{subbox\PYGZus{}dust\PYGZus{}density} \PYG{n}{subbox\PYGZus{}nxyz} \PYG{l+m+mi}{64} \PYG{l+m+mi}{64} \PYG{l+m+mi}{64} \PYG{n}{subbox\PYGZus{}xyz01} \PYG{o}{\PYGZhy{}}\PYG{l+m+mf}{2.e14} \PYG{l+m+mf}{2.e14} \PYG{o}{\PYGZhy{}}\PYG{l+m+mf}{2.e14} \PYG{l+m+mf}{2.e14} \PYG{o}{\PYGZhy{}}\PYG{l+m+mf}{2.e14} \PYG{l+m+mf}{2.e14}
+\PYG{n}{radmc3d} \PYG{n}{subbox\PYGZus{}dust\PYGZus{}temperature} \PYG{n}{subbox\PYGZus{}nxyz} \PYG{l+m+mi}{64} \PYG{l+m+mi}{64} \PYG{l+m+mi}{64} \PYG{n}{subbox\PYGZus{}xyz01} \PYG{o}{\PYGZhy{}}\PYG{l+m+mf}{2.e14} \PYG{l+m+mf}{2.e14} \PYG{o}{\PYGZhy{}}\PYG{l+m+mf}{2.e14} \PYG{l+m+mf}{2.e14} \PYG{o}{\PYGZhy{}}\PYG{l+m+mf}{2.e14} \PYG{l+m+mf}{2.e14}
+\end{sphinxVerbatim}
+
+Then go into Python and do:
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{from} \PYG{n+nn}{radmc3d\PYGZus{}tools}\PYG{n+nn}{.}\PYG{n+nn}{simpleread} \PYG{k}{import} \PYG{o}{*}
+\PYG{n}{dustdens} \PYG{o}{=} \PYG{n}{read\PYGZus{}subbox}\PYG{p}{(}\PYG{n}{name}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{dust\PYGZus{}density}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{dusttemp} \PYG{o}{=} \PYG{n}{read\PYGZus{}subbox}\PYG{p}{(}\PYG{n}{name}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{dust\PYGZus{}temperature}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+\PYG{n}{grid}     \PYG{o}{=} \PYG{n}{dustdens}\PYG{o}{.}\PYG{n}{grid}
+\PYG{k+kn}{import} \PYG{n+nn}{matplotlib}\PYG{n+nn}{.}\PYG{n+nn}{pyplot} \PYG{k}{as} \PYG{n+nn}{plt}
+\PYG{n}{rhodustmin} \PYG{o}{=} \PYG{l+m+mf}{1e\PYGZhy{}18}
+\PYG{n}{plt}\PYG{o}{.}\PYG{n}{figure}\PYG{p}{(}\PYG{p}{)}
+\PYG{n}{plt}\PYG{o}{.}\PYG{n}{imshow}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{log10}\PYG{p}{(}\PYG{n}{dustdens}\PYG{o}{.}\PYG{n}{data}\PYG{p}{[}\PYG{p}{:}\PYG{p}{,}\PYG{p}{:}\PYG{p}{,}\PYG{l+m+mi}{32}\PYG{p}{]}\PYG{o}{+}\PYG{n}{rhodustmin}\PYG{p}{)}\PYG{p}{,}\PYG{n}{extent}\PYG{o}{=}\PYG{p}{[}\PYG{n}{grid}\PYG{o}{.}\PYG{n}{x}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}\PYG{p}{,}\PYG{n}{grid}\PYG{o}{.}\PYG{n}{x}\PYG{p}{[}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{]}\PYG{p}{,}\PYG{n}{grid}\PYG{o}{.}\PYG{n}{y}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}\PYG{p}{,}\PYG{n}{grid}\PYG{o}{.}\PYG{n}{y}\PYG{p}{[}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{]}\PYG{p}{]}\PYG{p}{)}
+\PYG{n}{plt}\PYG{o}{.}\PYG{n}{figure}\PYG{p}{(}\PYG{p}{)}
+\PYG{n}{plt}\PYG{o}{.}\PYG{n}{imshow}\PYG{p}{(}\PYG{n}{dusttemp}\PYG{o}{.}\PYG{n}{data}\PYG{p}{[}\PYG{p}{:}\PYG{p}{,}\PYG{p}{:}\PYG{p}{,}\PYG{l+m+mi}{32}\PYG{p}{]}\PYG{p}{)}
+\PYG{n}{plt}\PYG{o}{.}\PYG{n}{show}\PYG{p}{(}\PYG{p}{)}
+\end{sphinxVerbatim}
 
 
 \section{Alternative to subbox: arbitrary sampling of AMR\sphinxhyphen{}based models}
@@ -10233,15 +10621,14 @@ See Section {\hyperref[\detokenize{toolsinside:sec-subbox}]{\sphinxcrossref{\DUr
 \end{itemize}
 
 
-\section{INPUT (required): amr\_grid.inp}
-\label{\detokenize{inputoutputfiles:input-required-amr-grid-inp}}\label{\detokenize{inputoutputfiles:sec-grid-input}}
+\section{INPUT (required): amr\_grid.inp or unstr\_grid.inp}
+\label{\detokenize{inputoutputfiles:input-required-amr-grid-inp-or-unstr-grid-inp}}\label{\detokenize{inputoutputfiles:sec-grid-input}}
 This is the file that specifies what the spatial grid of the model looks
 like. See Chapter {\hyperref[\detokenize{gridding:chap-gridding}]{\sphinxcrossref{\DUrole{std,std-ref}{More information about the gridding}}}}. This file is essential, because most
 other \sphinxcode{\sphinxupquote{.inp}} and \sphinxcode{\sphinxupquote{.dat}} files are simple lists of numbers which do not
 contain any information about the grid. All information about the grid is
-contained in the \sphinxcode{\sphinxupquote{amr\_grid.inp}}, also for non\sphinxhyphen{}AMR regular grids. Note that
-in the future we will also allow for unstructured grids. The corresponding grid
-files will then be named differently.
+contained in the \sphinxcode{\sphinxupquote{amr\_grid.inp}}, also for non\sphinxhyphen{}AMR regular grids, or alternatively
+in the \sphinxcode{\sphinxupquote{unstr\_grid.inp}} file for unstructured grids.
 
 There are three possible AMR grid styles:
 \begin{itemize}
@@ -10254,6 +10641,19 @@ is not really ‘adaptive’). This is grid style 1.
 
 \item {} 
 Layer\sphinxhyphen{}style AMR. This is grid style 10.
+
+\end{itemize}
+
+Alternatively, there are a variety of possible unstructured grids:
+\begin{itemize}
+\item {} 
+Delaunay
+
+\item {} 
+Voronoi
+
+\item {} 
+Self\sphinxhyphen{}designed
 
 \end{itemize}
 
@@ -10550,6 +10950,198 @@ oct\sphinxhyphen{}tree refinement instead. The layers are meant to make the AMR 
 accessible, but are somewhat more memory consuming.
 
 
+\subsection{Unstructured grid}
+\label{\detokenize{inputoutputfiles:unstructured-grid}}\label{\detokenize{inputoutputfiles:sec-unstr-grid}}
+An unstructured grid (no matter whether Delaunay, Voronoi or general type) is
+specified in the file called \sphinxcode{\sphinxupquote{unstr\_grid.inp}}:
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+iformat                          \PYGZlt{}=== Typically 2 at present
+ncells                           \PYGZlt{}=== Nr of cells (both \PYGZdq{}closed\PYGZdq{} and \PYGZdq{}open\PYGZdq{} ones)
+nwalls                           \PYGZlt{}=== Nr of walls
+nverts                           \PYGZlt{}=== Nr of vertices
+cell\PYGZus{}max\PYGZus{}nr\PYGZus{}walls                \PYGZlt{}=== Max number of walls per cell
+cell\PYGZus{}max\PYGZus{}nr\PYGZus{}verts                \PYGZlt{}=== Max number of vertices per cell (0 means: not relevant)
+wall\PYGZus{}max\PYGZus{}nr\PYGZus{}verts                \PYGZlt{}=== Max number of vertices per wall (required if saving vertices)
+vert\PYGZus{}max\PYGZus{}nr\PYGZus{}cells                \PYGZlt{}=== Max number of cells per vertex (0 means: not relevant)
+ncells\PYGZus{}open                      \PYGZlt{}=== Nr of \PYGZdq{}open\PYGZdq{} cells
+hull\PYGZus{}nwalls                      \PYGZlt{}=== Nr of cell walls at the surface
+isave\PYGZus{}volumes                    \PYGZlt{}=== Include a list of cell volumes?
+isave\PYGZus{}sn\PYGZus{}vectors                 \PYGZlt{}=== Include a list of s and n vectors?
+isave\PYGZus{}cellcenters                \PYGZlt{}=== Include a list of cell center positions?
+isave\PYGZus{}vertices                   \PYGZlt{}=== Include the list of vertices?
+isave\PYGZus{}size                       \PYGZlt{}=== Include the list of cell sizes?
+hull\PYGZus{}convex                      \PYGZlt{}=== Are the surface cell walls convex?
+Volume of cell 1                 \PYGZbs{}  [If isave\PYGZus{}volumes==1]
+...                              |\PYGZhy{} Cell volumes
+Volume of cell ncells            /
+s and n of wall 1                \PYGZbs{}  [If isave\PYGZus{}sn\PYGZus{}vectors==1]
+...                              |\PYGZhy{} Support and normal vectors of walls: s\PYGZus{}x s\PYGZus{}y s\PYGZus{}z n\PYGZus{}x n\PYGZus{}y n\PYGZus{}z
+s and n of wall nwalls           /
+idx\PYGZus{}left idx\PYGZus{}right wall 1        \PYGZbs{}
+...                              |\PYGZhy{} Left and right cell indices of each cell wall
+idx\PYGZus{}left idx\PYGZus{}right wall nwalls   /
+cell center cell 1               \PYGZbs{}  [If isave\PYGZus{}cellcenters==1]
+...                              |\PYGZhy{} Center point of cells: p\PYGZus{}x p\PYGZus{}y p\PYGZus{}z
+cell center cell ncells          /
+idx\PYGZus{}vertices wall 1              \PYGZbs{}  [If isave\PYGZus{}vertices==1]
+...                              |\PYGZhy{} Indices of vertices spanning wall (wall\PYGZus{}max\PYGZus{}nr\PYGZus{}verts for each
+idx\PYGZus{}vertices wall nwalls         |  wall, if too many: pad with 0)
+vertex 1                         |
+...                              |\PYGZhy{} Vertices: v\PYGZus{}x v\PYGZus{}y v\PYGZus{}z
+vertex nverts                    /
+\end{sphinxVerbatim}
+
+The \sphinxcode{\sphinxupquote{ncells}} always has to give the number of cells. The order of the cells is
+always the same as the order of the physical variables in files such as
+\sphinxcode{\sphinxupquote{dust\_density.inp}} and the like.  The \sphinxcode{\sphinxupquote{nwalls}} always has to give the number
+of cell walls separating the cells. Each cell wall can only separate two
+cells. Even if more cells lie on the same plane, each pair of adjacent cells
+must share one and only one wall. It is not a problem if more than one wall lie
+in the same plane. The \sphinxcode{\sphinxupquote{nverts}} is only required if you specify the vertices
+(i.e. if \sphinxcode{\sphinxupquote{isave\_vertices==1}}). Set to 0 if you don’t need it.
+
+Since each cell can have a multitude of walls, for interal bookkeeping it is
+useful to know in advance the maximum number of walls per cell, which is given
+by \sphinxcode{\sphinxupquote{cell\_max\_nr\_walls}} (if it is chosen too small, RADMC\sphinxhyphen{}3D will try to
+internally correct it). Likewise for the maximum number of vertices per cell
+given by \sphinxcode{\sphinxupquote{cell\_max\_nr\_verts}}.
+
+If (and only if) you provide the vertices of the grid (setting
+\sphinxcode{\sphinxupquote{isave\_vertices=1}}) you also need to specify the maximum number of
+vertices per wall \sphinxcode{\sphinxupquote{wall\_max\_nr\_verts}} (this you must specify correctly,
+as it determined how many vertex indices per wall are provided further down)
+and the maximum number of cells per vertex \sphinxcode{\sphinxupquote{vert\_max\_nr\_cells}}, which can
+be an estimate (RADMC\sphinxhyphen{}3D will try to correct it).
+
+At the surface of the grid there are either ‘hull walls’ or ‘open cells’.  For
+Delaunay grids, and presumably for your own\sphinxhyphen{}designed grids, you will have ‘hull
+walls’ which have only 1 cell on one side (the first of the two cell indices
+specified) and the other side facing the vacuum. The hull walls should close the
+grid, separating the grid from the outside.  For Voronoi grids the cells on the
+edge of the domain are, instead, open: They go off to infinity. You have to
+specify how many hull walls or open cells you have (RADMC\sphinxhyphen{}3D has only been
+tested for either hull walls or open cells, not a combination): \sphinxcode{\sphinxupquote{hull\_nwalls}}
+or \sphinxcode{\sphinxupquote{ncells\_open}}.
+
+The way you specify the grid is flexible. By setting \sphinxcode{\sphinxupquote{isave\_volumes=1}} you
+give the cell volume for each cell (see below). Setting instead
+\sphinxcode{\sphinxupquote{isave\_volumes=0}} asks RADMC\sphinxhyphen{}3D to compute the cell volumes internally.  So
+far RADMC\sphinxhyphen{}3D can only compute cell volumes if the cells are tetrahedral
+(i.e.\textasciitilde{}simplices), but maybe in the future this may change/improve.  By setting
+\sphinxcode{\sphinxupquote{isave\_sn\_vectors=1}} you give the support\sphinxhyphen{} and normal\sphinxhyphen{}vector of each
+wall. This makes the gridding very flexible, but it also costs a lot of disk
+space: 6 floats per wall. If you instead set \sphinxcode{\sphinxupquote{isave\_sn\_vectors=0}} then you ask
+RADMC\sphinxhyphen{}3D to compute these internally from whatever other information is has
+(either from the vertices or by assuming Voronoi\sphinxhyphen{}type walls).  By setting
+\sphinxcode{\sphinxupquote{isave\_cellcenters=1}} you give the exact location of each cell center
+point. For Voronoi grids this is a must, as the Voronoi grid is defined by its
+cell centers. For other grids (including Delaunay) this can be skipped (set
+\sphinxcode{\sphinxupquote{isave\_cellcenters=0}}) if the vertices are specified.  If you set
+\sphinxcode{\sphinxupquote{isave\_vertices=1}} you specify the vertices. For Delaunay grids this is a
+must, as the Delaunay grid is defined by its vertices. For Voronoi grids you
+can omit these (by setting \sphinxcode{\sphinxupquote{isave\_vertices=0}}) as RADMC\sphinxhyphen{}3D will then construct
+the cell walls automatically assuming them to lie exactly in between the two
+points. Finally, for the radiative transfer calculations as well as for
+handling precision errors, it is useful for RADMC\sphinxhyphen{}3D to know what the
+‘size’ is of a cell (even though with non\sphinxhyphen{}cubic cells a ‘size’ may not be
+uniquely defined). If not specified (\sphinxcode{\sphinxupquote{isave\_size==0}}) then RADMC\sphinxhyphen{}3D will
+estimate it as the cubic root of the volume. But if you set \sphinxcode{\sphinxupquote{isave\_size=1}}
+then you can specify, for each cell, this ‘size’.
+
+Depending on the settings of \sphinxcode{\sphinxupquote{isave\_volumes}}, \sphinxcode{\sphinxupquote{isave\_sn\_vectors}},
+\sphinxcode{\sphinxupquote{isave\_cellcenters}}, \sphinxcode{\sphinxupquote{isave\_vertices}}, and \sphinxcode{\sphinxupquote{isave\_size}}, the corresponding
+data are listed in the order shown above.
+
+Here is an example of a \sphinxcode{\sphinxupquote{unstr\_grid.inp}} file for a Delaunay grid:
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{l+m+mi}{2}                    \PYG{o}{\PYGZlt{}}\PYG{o}{==}\PYG{o}{=} \PYG{n}{Format} \PYG{n}{number} \PYG{l+m+mi}{2}
+\PYG{l+m+mi}{199462}               \PYG{o}{\PYGZlt{}}\PYG{o}{==}\PYG{o}{=} \PYG{n}{Nr} \PYG{n}{of} \PYG{n}{cells} \PYG{p}{(}\PYG{k}{for} \PYG{n}{Delaunay} \PYG{n}{grids} \PYG{n}{usually} \PYG{o}{\PYGZgt{}\PYGZgt{}} \PYG{n}{nr} \PYG{n}{of} \PYG{n}{vertices}\PYG{p}{)}
+\PYG{l+m+mi}{399691}               \PYG{o}{\PYGZlt{}}\PYG{o}{==}\PYG{o}{=} \PYG{n}{Nr} \PYG{n}{of} \PYG{n}{walls} \PYG{p}{(}\PYG{k}{for} \PYG{n}{Delaunay} \PYG{n}{grids} \PYG{n}{usually} \PYG{o}{\PYGZgt{}\PYGZgt{}} \PYG{n}{nr} \PYG{n}{of} \PYG{n}{vertices}\PYG{p}{)}
+\PYG{l+m+mi}{30000}                \PYG{o}{\PYGZlt{}}\PYG{o}{==}\PYG{o}{=} \PYG{n}{Nr} \PYG{n}{of} \PYG{n}{vertices}
+\PYG{l+m+mi}{4}                    \PYG{o}{\PYGZlt{}}\PYG{o}{==}\PYG{o}{=} \PYG{n}{For} \PYG{n}{Delaunay} \PYG{n}{grid}\PYG{p}{:} \PYG{n}{always} \PYG{n}{exactly} \PYG{l+m+mi}{4} \PYG{n}{cell} \PYG{n}{walls} \PYG{n}{per} \PYG{n}{cell}
+\PYG{l+m+mi}{4}                    \PYG{o}{\PYGZlt{}}\PYG{o}{==}\PYG{o}{=} \PYG{n}{For} \PYG{n}{Delaunay} \PYG{n}{grid}\PYG{p}{:} \PYG{n}{always} \PYG{n}{exactly} \PYG{l+m+mi}{4} \PYG{n}{vertices} \PYG{n}{per} \PYG{n}{cell}
+\PYG{l+m+mi}{3}                    \PYG{o}{\PYGZlt{}}\PYG{o}{==}\PYG{o}{=} \PYG{n}{For} \PYG{n}{Delaunay} \PYG{n}{grid}\PYG{p}{:} \PYG{n}{always} \PYG{n}{exactly} \PYG{l+m+mi}{3} \PYG{n}{vertices} \PYG{n}{per} \PYG{n}{wall}
+\PYG{l+m+mi}{0}                    \PYG{o}{\PYGZlt{}}\PYG{o}{==}\PYG{o}{=} \PYG{n}{Not} \PYG{n}{necessary} \PYG{n}{to} \PYG{n}{specify}
+\PYG{l+m+mi}{0}                    \PYG{o}{\PYGZlt{}}\PYG{o}{==}\PYG{o}{=} \PYG{n}{For} \PYG{n}{Delaunay} \PYG{n}{grid}\PYG{p}{:} \PYG{n}{no} \PYG{n+nb}{open} \PYG{n}{cells}
+\PYG{l+m+mi}{1534}                 \PYG{o}{\PYGZlt{}}\PYG{o}{==}\PYG{o}{=} \PYG{n}{Nr} \PYG{n}{of} \PYG{n}{walls} \PYG{n}{at} \PYG{n}{the} \PYG{n}{surface} \PYG{p}{(}\PYG{n}{the} \PYG{n}{hull}\PYG{p}{)}
+\PYG{l+m+mi}{0}                    \PYG{o}{\PYGZlt{}}\PYG{o}{==}\PYG{o}{=} \PYG{n}{For} \PYG{n}{Delaunay} \PYG{n}{grid}\PYG{p}{:} \PYG{n}{RADMC}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{3}\PYG{n}{D} \PYG{n}{computes} \PYG{n}{the} \PYG{n}{volume}
+\PYG{l+m+mi}{0}                    \PYG{o}{\PYGZlt{}}\PYG{o}{==}\PYG{o}{=} \PYG{n}{For} \PYG{n}{Delaunay} \PYG{n}{grid}\PYG{p}{:} \PYG{n}{RADMC}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{3}\PYG{n}{D} \PYG{n}{computes} \PYG{n}{the} \PYG{n}{s} \PYG{o+ow}{and} \PYG{n}{n}
+\PYG{l+m+mi}{0}                    \PYG{o}{\PYGZlt{}}\PYG{o}{==}\PYG{o}{=} \PYG{n}{For} \PYG{n}{Delaunay} \PYG{n}{grid}\PYG{p}{:} \PYG{n}{RADMC}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{3}\PYG{n}{D} \PYG{n}{computes} \PYG{n}{the} \PYG{n}{cell} \PYG{n}{centers}
+\PYG{l+m+mi}{1}                    \PYG{o}{\PYGZlt{}}\PYG{o}{==}\PYG{o}{=} \PYG{n}{For} \PYG{n}{Delaunay} \PYG{n}{grid}\PYG{p}{:} \PYG{n}{Must} \PYG{n}{specify} \PYG{n}{the} \PYG{n}{vertices}
+\PYG{l+m+mi}{0}                    \PYG{o}{\PYGZlt{}}\PYG{o}{==}\PYG{o}{=} \PYG{n}{Compute} \PYG{n}{the} \PYG{n}{size} \PYG{k+kn}{from} \PYG{n+nn}{the} \PYG{n}{volume}\PYG{o}{*}\PYG{o}{*}\PYG{l+m+mf}{0.33333}
+\PYG{l+m+mi}{1}                    \PYG{o}{\PYGZlt{}}\PYG{o}{==}\PYG{o}{=} \PYG{n}{For} \PYG{n}{Delaunay} \PYG{n}{grid}\PYG{p}{:} \PYG{n}{Yes}\PYG{p}{,} \PYG{n}{the} \PYG{n}{hull} \PYG{o+ow}{is} \PYG{n}{convex}
+\PYG{l+m+mi}{1} \PYG{l+m+mi}{0}                  \PYG{o}{\PYGZlt{}}\PYG{o}{==}\PYG{o}{=} \PYG{n}{First} \PYG{n}{wall}\PYG{p}{,} \PYG{n}{connecting} \PYG{n}{to} \PYG{n}{cell} \PYG{l+m+mi}{1} \PYG{n}{to} \PYG{n}{the} \PYG{n}{vacuum} \PYG{p}{(}\PYG{n}{i}\PYG{o}{.}\PYG{n}{e}\PYG{o}{.} \PYG{n}{part} \PYG{n}{of} \PYG{n}{hull}\PYG{p}{)}
+\PYG{l+m+mi}{5} \PYG{l+m+mi}{0}
+\PYG{l+m+mi}{7} \PYG{l+m+mi}{0}
+\PYG{l+m+mi}{9} \PYG{l+m+mi}{0}
+\PYG{o}{.}\PYG{o}{.}\PYG{o}{.}                  \PYG{o}{\PYGZlt{}}\PYG{o}{==}\PYG{o}{=} \PYG{n}{Many}\PYG{p}{,} \PYG{n}{many} \PYG{n}{lines}\PYG{o}{.}\PYG{o}{.}\PYG{o}{.}
+\PYG{l+m+mi}{154309} \PYG{l+m+mi}{0}
+\PYG{l+m+mi}{154310} \PYG{l+m+mi}{0}             \PYG{o}{\PYGZlt{}}\PYG{o}{==}\PYG{o}{=} \PYG{n}{Wall} \PYG{n}{connecting} \PYG{n}{cell} \PYG{l+m+mi}{154310} \PYG{n}{to} \PYG{n}{the} \PYG{n}{vacuum} \PYG{p}{(}\PYG{n}{last} \PYG{n}{of} \PYG{n}{the} \PYG{n}{hull} \PYG{n}{walls}\PYG{p}{)}
+\PYG{l+m+mi}{1} \PYG{l+m+mi}{45}                 \PYG{o}{\PYGZlt{}}\PYG{o}{==}\PYG{o}{=} \PYG{n}{Wall} \PYG{n}{connecting} \PYG{n}{cells} \PYG{l+m+mi}{1} \PYG{o+ow}{and} \PYG{l+m+mi}{45} \PYG{p}{(}\PYG{n}{first} \PYG{n}{of} \PYG{n}{the} \PYG{n}{internal} \PYG{n}{walls}\PYG{p}{)}
+\PYG{l+m+mi}{1} \PYG{l+m+mi}{160}
+\PYG{l+m+mi}{1} \PYG{l+m+mi}{2}
+\PYG{o}{.}\PYG{o}{.}\PYG{o}{.}                  \PYG{o}{\PYGZlt{}}\PYG{o}{==}\PYG{o}{=} \PYG{n}{Many}\PYG{p}{,} \PYG{n}{many} \PYG{n}{lines}\PYG{o}{.}\PYG{o}{.}\PYG{o}{.}
+\PYG{l+m+mi}{199460} \PYG{l+m+mi}{199462}
+\PYG{l+m+mi}{199461} \PYG{l+m+mi}{199462}        \PYG{o}{\PYGZlt{}}\PYG{o}{==}\PYG{o}{=} \PYG{n}{Last} \PYG{n}{cell} \PYG{n}{wall}\PYG{p}{,} \PYG{n}{connecting} \PYG{n}{cells} \PYG{l+m+mi}{199461} \PYG{o+ow}{and} \PYG{l+m+mi}{199462}
+\PYG{l+m+mi}{22156} \PYG{l+m+mi}{15798} \PYG{l+m+mi}{12402}    \PYG{o}{\PYGZlt{}}\PYG{o}{==}\PYG{o}{=} \PYG{n}{First} \PYG{n}{cell} \PYG{n}{wall}\PYG{p}{:} \PYG{n}{indices} \PYG{n}{of} \PYG{n}{the} \PYG{n}{three} \PYG{n}{vertices} \PYG{n}{of} \PYG{n}{this} \PYG{n}{wall}
+\PYG{l+m+mi}{19848} \PYG{l+m+mi}{2591} \PYG{l+m+mi}{5486}
+\PYG{o}{.}\PYG{o}{.}\PYG{o}{.}                  \PYG{o}{\PYGZlt{}}\PYG{o}{==}\PYG{o}{=} \PYG{n}{Many}\PYG{p}{,} \PYG{n}{many} \PYG{n}{lines}\PYG{o}{.}\PYG{o}{.}\PYG{o}{.}
+\PYG{l+m+mi}{26358} \PYG{l+m+mi}{1240} \PYG{l+m+mi}{11951}
+\PYG{l+m+mi}{26358} \PYG{l+m+mi}{19577} \PYG{l+m+mi}{11951}    \PYG{o}{\PYGZlt{}}\PYG{o}{==}\PYG{o}{=} \PYG{n}{Last} \PYG{n}{cell} \PYG{n}{wall}\PYG{p}{:} \PYG{n}{indices} \PYG{n}{of} \PYG{n}{the} \PYG{n}{three} \PYG{n}{vertices} \PYG{n}{of} \PYG{n}{this} \PYG{n}{wall}
+\PYG{o}{\PYGZhy{}}\PYG{l+m+mf}{9.158735473036884375e+13} \PYG{o}{\PYGZhy{}}\PYG{l+m+mf}{7.011778907885211719e+13} \PYG{l+m+mf}{6.039256438409164844e+13}   \PYG{o}{\PYGZlt{}}\PYG{o}{==}\PYG{o}{=} \PYG{n}{First} \PYG{n}{vertex}
+\PYG{o}{\PYGZhy{}}\PYG{l+m+mf}{6.263232133764155469e+13} \PYG{l+m+mf}{1.286041325985346719e+14} \PYG{l+m+mf}{6.671766425868976562e+12}
+\PYG{o}{.}\PYG{o}{.}\PYG{o}{.}                                                                            \PYG{o}{\PYGZlt{}}\PYG{o}{==}\PYG{o}{=} \PYG{n}{Many}\PYG{p}{,} \PYG{n}{many} \PYG{n}{lines}\PYG{o}{.}\PYG{o}{.}\PYG{o}{.}
+\PYG{o}{\PYGZhy{}}\PYG{l+m+mf}{8.918647910718467188e+13} \PYG{o}{\PYGZhy{}}\PYG{l+m+mf}{7.056527384485303125e+13} \PYG{o}{\PYGZhy{}}\PYG{l+m+mf}{5.088009729690025000e+13}
+\PYG{o}{\PYGZhy{}}\PYG{l+m+mf}{6.440888241873650000e+13} \PYG{o}{\PYGZhy{}}\PYG{l+m+mf}{1.108250266699581299e+12} \PYG{o}{\PYGZhy{}}\PYG{l+m+mf}{2.545886642466098438e+13}  \PYG{o}{\PYGZlt{}}\PYG{o}{==}\PYG{o}{=} \PYG{n}{Last} \PYG{n}{vertex}
+\end{sphinxVerbatim}
+
+And here is an example of a \sphinxcode{\sphinxupquote{unstr\_grid.inp}} file for a Voronoi grid:
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{l+m+mi}{2}                    \PYG{o}{\PYGZlt{}}\PYG{o}{==}\PYG{o}{=} \PYG{n}{Format} \PYG{n}{number} \PYG{l+m+mi}{2}
+\PYG{l+m+mi}{30000}                \PYG{o}{\PYGZlt{}}\PYG{o}{==}\PYG{o}{=} \PYG{n}{Nr} \PYG{n}{of} \PYG{n}{cells} \PYG{p}{(}\PYG{o}{=} \PYG{n}{number} \PYG{n}{of} \PYG{n}{points}\PYG{p}{)}
+\PYG{l+m+mi}{230058}               \PYG{o}{\PYGZlt{}}\PYG{o}{==}\PYG{o}{=} \PYG{n}{Nr} \PYG{n}{of} \PYG{n}{walls}
+\PYG{l+m+mi}{0}                    \PYG{o}{\PYGZlt{}}\PYG{o}{==}\PYG{o}{=} \PYG{n}{Can} \PYG{n}{be} \PYG{n}{kept} \PYG{l+m+mi}{0}
+\PYG{l+m+mi}{33}                   \PYG{o}{\PYGZlt{}}\PYG{o}{==}\PYG{o}{=} \PYG{n}{Maximum} \PYG{n}{nr} \PYG{n}{of} \PYG{n}{walls} \PYG{n}{per} \PYG{n}{cell} \PYG{p}{(}\PYG{n}{can} \PYG{n}{be} \PYG{n}{many} \PYG{k}{for} \PYG{n}{Voronoi} \PYG{n}{cells}\PYG{p}{)}
+\PYG{l+m+mi}{0}                    \PYG{o}{\PYGZlt{}}\PYG{o}{==}\PYG{o}{=} \PYG{n}{Can} \PYG{n}{be} \PYG{n}{kept} \PYG{l+m+mi}{0}
+\PYG{l+m+mi}{0}                    \PYG{o}{\PYGZlt{}}\PYG{o}{==}\PYG{o}{=} \PYG{n}{Can} \PYG{n}{be} \PYG{n}{kept} \PYG{l+m+mi}{0} \PYG{n}{because} \PYG{n}{we} \PYG{n}{don}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{t list the vertices}
+\PYG{l+m+mi}{0}                    \PYG{o}{\PYGZlt{}}\PYG{o}{==}\PYG{o}{=} \PYG{n}{Can} \PYG{n}{be} \PYG{n}{kept} \PYG{l+m+mi}{0} \PYG{n}{because} \PYG{n}{we} \PYG{n}{don}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{t list the vertices}
+\PYG{l+m+mi}{769}                  \PYG{o}{\PYGZlt{}}\PYG{o}{==}\PYG{o}{=} \PYG{n}{Nr} \PYG{n}{of} \PYG{n+nb}{open} \PYG{n}{cells}
+\PYG{l+m+mi}{0}                    \PYG{o}{\PYGZlt{}}\PYG{o}{==}\PYG{o}{=} \PYG{n}{Nr} \PYG{n}{of} \PYG{n}{hull} \PYG{n}{walls} \PYG{p}{(}\PYG{k}{for} \PYG{n}{Voronoi}\PYG{p}{:} \PYG{n}{must} \PYG{n}{be} \PYG{l+m+mi}{0}\PYG{p}{)}
+\PYG{l+m+mi}{1}                    \PYG{o}{\PYGZlt{}}\PYG{o}{==}\PYG{o}{=} \PYG{n}{For} \PYG{n}{Voronoi} \PYG{n}{grid}\PYG{p}{:} \PYG{n}{Must} \PYG{n}{specify} \PYG{n}{cell} \PYG{n}{volumes}
+\PYG{l+m+mi}{0}                    \PYG{o}{\PYGZlt{}}\PYG{o}{==}\PYG{o}{=} \PYG{n}{For} \PYG{n}{Voronoi} \PYG{n}{grid}\PYG{p}{:} \PYG{n}{RADMC}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{3}\PYG{n}{D} \PYG{n}{computes} \PYG{n}{the} \PYG{n}{s} \PYG{o+ow}{and} \PYG{n}{n}
+\PYG{l+m+mi}{1}                    \PYG{o}{\PYGZlt{}}\PYG{o}{==}\PYG{o}{=} \PYG{n}{For} \PYG{n}{Voronoi} \PYG{n}{grid}\PYG{p}{:} \PYG{n}{Cell} \PYG{n}{centers} \PYG{n}{must} \PYG{n}{be} \PYG{n}{specified}
+\PYG{l+m+mi}{0}                    \PYG{o}{\PYGZlt{}}\PYG{o}{==}\PYG{o}{=} \PYG{n}{For} \PYG{n}{Voronoi} \PYG{n}{grid}\PYG{p}{:} \PYG{n}{Vertices} \PYG{o+ow}{not} \PYG{n}{explicitly} \PYG{n}{necessary}
+\PYG{l+m+mi}{0}                    \PYG{o}{\PYGZlt{}}\PYG{o}{==}\PYG{o}{=} \PYG{n}{Compute} \PYG{n}{the} \PYG{n}{size} \PYG{k+kn}{from} \PYG{n+nn}{the} \PYG{n}{volume}\PYG{o}{*}\PYG{o}{*}\PYG{l+m+mf}{0.33333}
+\PYG{l+m+mi}{0}                    \PYG{o}{\PYGZlt{}}\PYG{o}{==}\PYG{o}{=} \PYG{n}{Since} \PYG{n}{we} \PYG{n}{have} \PYG{n}{no} \PYG{n}{hull} \PYG{n}{walls}\PYG{p}{,} \PYG{n}{this} \PYG{o+ow}{is} \PYG{n}{irrelevant}
+\PYG{l+m+mf}{2.772699983914995096e+38}   \PYG{o}{\PYGZlt{}}\PYG{o}{==}\PYG{o}{=} \PYG{n}{Volume} \PYG{n}{of} \PYG{n}{the} \PYG{n}{first} \PYG{n}{cell}
+\PYG{l+m+mf}{3.855434192315507956e+38}
+\PYG{l+m+mf}{0.000000000000000000e+00}   \PYG{o}{\PYGZlt{}}\PYG{o}{==}\PYG{o}{=} \PYG{n}{Zero} \PYG{n}{volume} \PYG{o}{=} \PYG{n+nb}{open} \PYG{n}{cell}
+\PYG{l+m+mf}{4.187946751113876048e+38}
+\PYG{o}{.}\PYG{o}{.}\PYG{o}{.}                        \PYG{o}{\PYGZlt{}}\PYG{o}{==}\PYG{o}{=} \PYG{n}{Many}\PYG{p}{,} \PYG{n}{many} \PYG{n}{lines}\PYG{o}{.}\PYG{o}{.}\PYG{o}{.}
+\PYG{l+m+mf}{4.765148695599201280e+38}
+\PYG{l+m+mf}{1.699867329158221159e+39}   \PYG{o}{\PYGZlt{}}\PYG{o}{==}\PYG{o}{=} \PYG{n}{Volume} \PYG{n}{of} \PYG{n}{the} \PYG{n}{last} \PYG{n}{cell}
+\PYG{l+m+mi}{13738} \PYG{l+m+mi}{5006}                 \PYG{o}{\PYGZlt{}}\PYG{o}{==}\PYG{o}{=} \PYG{n}{First} \PYG{n}{cell} \PYG{n}{wall} \PYG{n}{connects} \PYG{n}{cell} \PYG{l+m+mi}{13738} \PYG{k}{with} \PYG{n}{cell} \PYG{l+m+mi}{5006}
+\PYG{l+m+mi}{13738} \PYG{l+m+mi}{29031}
+\PYG{o}{.}\PYG{o}{.}\PYG{o}{.}                        \PYG{o}{\PYGZlt{}}\PYG{o}{==}\PYG{o}{=} \PYG{n}{Many}\PYG{p}{,} \PYG{n}{many} \PYG{n}{lines}\PYG{o}{.}\PYG{o}{.}\PYG{o}{.}
+\PYG{l+m+mi}{28953} \PYG{l+m+mi}{29538}
+\PYG{l+m+mi}{29177} \PYG{l+m+mi}{29815}                \PYG{o}{\PYGZlt{}}\PYG{o}{==}\PYG{o}{=} \PYG{n}{Last} \PYG{n}{cell} \PYG{n}{wall} \PYG{n}{connects} \PYG{n}{cell} \PYG{l+m+mi}{29177} \PYG{k}{with} \PYG{l+m+mi}{29815}
+\PYG{l+m+mf}{3.224145067583187109e+13} \PYG{l+m+mf}{1.185761258774503594e+14} \PYG{l+m+mf}{6.399869810360167969e+13}    \PYG{o}{\PYGZlt{}}\PYG{o}{==}\PYG{o}{=} \PYG{n}{First} \PYG{n}{cell} \PYG{n}{center}
+\PYG{l+m+mf}{1.024309911261237656e+14} \PYG{l+m+mf}{9.824700277721357812e+13} \PYG{o}{\PYGZhy{}}\PYG{l+m+mf}{2.709320785406102344e+13}
+\PYG{o}{.}\PYG{o}{.}\PYG{o}{.}                                                                           \PYG{o}{\PYGZlt{}}\PYG{o}{==}\PYG{o}{=} \PYG{n}{Many}\PYG{p}{,} \PYG{n}{many} \PYG{n}{lines}\PYG{o}{.}\PYG{o}{.}\PYG{o}{.}
+\PYG{o}{\PYGZhy{}}\PYG{l+m+mf}{4.278522643567171094e+13} \PYG{o}{\PYGZhy{}}\PYG{l+m+mf}{1.519077018470512695e+13} \PYG{l+m+mf}{1.098029901859170156e+14}
+\PYG{o}{\PYGZhy{}}\PYG{l+m+mf}{8.087822681846140625e+13} \PYG{o}{\PYGZhy{}}\PYG{l+m+mf}{1.158794225153191562e+14} \PYG{l+m+mf}{4.059165911623856250e+13}  \PYG{o}{\PYGZlt{}}\PYG{o}{==}\PYG{o}{=} \PYG{n}{Last} \PYG{n}{cell} \PYG{n}{center}
+\end{sphinxVerbatim}
+
+RADMC\sphinxhyphen{}3D does not need to explicitly know if a grid is Voronoi or Delaunay,
+because the input file, in particular which data are given (see the
+\sphinxcode{\sphinxupquote{isave\_xxx}} flags), automatically makes it correct. In the actual internal
+workings of RADMC\sphinxhyphen{}3D it does not care about whether it is Voronoi or Delaunay:
+it only cares about cell volumes and cell walls.
+
+
 \section{INPUT (required for dust transfer): dust\_density.inp}
 \label{\detokenize{inputoutputfiles:input-required-for-dust-transfer-dust-density-inp}}\label{\detokenize{inputoutputfiles:sec-dustdens}}
 This is the file that contains the dust densities. It is merely a list of
@@ -10592,7 +11184,7 @@ excluding the cells that are in fact the parents of 2x2x2 subcells; i.e.
 the sum of the volumes of all true cells (=leafs) adds up to the volume of
 the total grid). The order of these numbers is always the same ‘immediate
 recursive subtree entry’ as in the \sphinxcode{\sphinxupquote{amr\_grid.inp}}
-(Section {\hyperref[\detokenize{inputoutputfiles:sec-grid-input}]{\sphinxcrossref{\DUrole{std,std-ref}{INPUT (required): amr\_grid.inp}}}}).
+(Section {\hyperref[\detokenize{inputoutputfiles:sec-grid-input}]{\sphinxcrossref{\DUrole{std,std-ref}{INPUT (required): amr\_grid.inp or unstr\_grid.inp}}}}).
 
 \item {} 
 \sphinxstyleemphasis{For layer\sphinxhyphen{}style AMR grids:}
@@ -10654,7 +11246,7 @@ numbers in the cells.}\label{\detokenize{inputoutputfiles:id1}}\label{\detokeniz
 For the case when you have an oct\sphinxhyphen{}tree refined grid (see Sections
 {\hyperref[\detokenize{inputoutputfiles:sec-amr-grid-oct-tree}]{\sphinxcrossref{\DUrole{std,std-ref}{Oct\sphinxhyphen{}tree\sphinxhyphen{}style AMR grid}}}} and {\hyperref[\detokenize{gridding:sec-oct-tree-amr}]{\sphinxcrossref{\DUrole{std,std-ref}{Oct\sphinxhyphen{}tree Adaptive Mesh Refinement}}}}), the order of the
 numbers is the same as the order of the cells as specified in the
-\sphinxcode{\sphinxupquote{amr\_grid.(u)inp}} file (Section {\hyperref[\detokenize{inputoutputfiles:sec-grid-input}]{\sphinxcrossref{\DUrole{std,std-ref}{INPUT (required): amr\_grid.inp}}}}).  Let us take the
+\sphinxcode{\sphinxupquote{amr\_grid.(u)inp}} file (Section {\hyperref[\detokenize{inputoutputfiles:sec-grid-input}]{\sphinxcrossref{\DUrole{std,std-ref}{INPUT (required): amr\_grid.inp or unstr\_grid.inp}}}}).  Let us take the
 example of a simple 1x1x1 grid which is refined into 2x2x2 and for which the
 (1,2,1) cell is refined again in 2x2x2 (this is exactly the same example as
 shown in Section {\hyperref[\detokenize{inputoutputfiles:sec-amr-grid-oct-tree}]{\sphinxcrossref{\DUrole{std,std-ref}{Oct\sphinxhyphen{}tree\sphinxhyphen{}style AMR grid}}}}, and for which the
@@ -12735,6 +13327,12 @@ the most common WWW databases, we provide Python routines for the conversion.
 Please read the \sphinxcode{\sphinxupquote{README\_*}} files in this directory and its
 subdirectories for details.
 
+Note also that Carsten Dominik made a very nice and easy\sphinxhyphen{}to\sphinxhyphen{}use tool to
+generate dust opacities on the Linux/Mac command line. It is called
+\sphinxcode{\sphinxupquote{optool}}, and can be found on github at
+\sphinxurl{https://github.com/cdominik/optool} .
+It can produce RADMC\sphinxhyphen{}3D\sphinxhyphen{}ready dust opacity files.
+
 
 \chapter{Version tracker: Development history}
 \label{\detokenize{versiontracker:version-tracker-development-history}}\label{\detokenize{versiontracker:chap-development-history}}\label{\detokenize{versiontracker::doc}}
@@ -13335,6 +13933,19 @@ and will remove it from the code in later versions. Use either text
 \item {} 
 The manual is now converted to Sphinx, from which the LaTeX version
 and the HTML version can be automatically created.
+
+\item {} 
+{[}as of 11.11.2021{]} BUGFIX: For OpenMP parallel thermal Monte Carlo
+computation of the dust temperatures for multiple grain species or
+sizes, when \sphinxcode{\sphinxupquote{iranfreqmode=1}} (as opposed to the default value of
+\sphinxcode{\sphinxupquote{iranfreqmode=0}}), the dust temperatures could acquire errors
+because the \sphinxcode{\sphinxupquote{pick\_randomfreq\_db()}} subroutine uses the array
+\sphinxcode{\sphinxupquote{db\_cumul(:)}} as thread private, but without having it declared
+as such. This led to interference between threads. This is now
+fixed.
+
+\item {} 
+{[}as of 30.01.2022{]} Added unstructured grid support.
 
 \end{itemize}
 

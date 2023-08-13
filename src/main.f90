@@ -139,6 +139,7 @@ program radmc3d
   lines_show_pictograms      = 0
   lines_maser_warning        = .false.
   lines_slowlvg_as_alternative = .false.
+  lines_artificial_widening_factor = 0.d0
   !
   ! Thermal boundary conditions (only for 
   ! cartesian coordinates)
@@ -369,6 +370,13 @@ program radmc3d
   ! Otherwise make an emergency stop.
   !
   call read_radmcinp_file()
+  !
+  ! Check that SED and lines are not on simultaneously
+  !
+  if(rt_incl_lines.and.do_raytrace_spectrum.and.camera_setfreq_global) then
+     write(stdo,*) 'ERROR: Cannot make SED with line mode on.'
+     stop
+  endif
   !
   ! If OMP, then immediately set the nr of threads here, now that we
   ! know which value it should have: the setthreads variable.
@@ -642,28 +650,7 @@ program radmc3d
      if(amrray_mirror_equator) then
         igrid_mirror = 1
      endif
-  else
-     stop 1400
   endif
-  !
-  ! If lines are included in the model, we now check for the maximum
-  ! cell-to-cell line shift compared to the local line width. 
-  !
-  if(rt_incl_lines.and.allocated(gasvelocity).and. &
-       allocated(lines_microturb).and.allocated(gastemp)) then
-     lines_maxrelshift = 0.d0
-     call lines_compute_maxrellineshift()
-     if(lines_maxrelshift.gt.0.7d0) then
-        write(stdo,*) 'WARNING: cell-to-cell line doppler shifts are large compared to the local line width.'
-        write(stdo,*) '   In this model the largest dv_doppler/dv_linewidth = ',lines_maxrelshift
-        if(camera_catch_doppler_line) then
-           write(stdo,*) '   But since you are using doppler catching mode, you are reasonably safe...'
-        else
-           write(stdo,*) '   To get reasonable line images/spectra please use the doppler catching mode.'
-        endif
-     endif
-  endif
-  !
   !
   ! ====================================================================
   !                     NOW START THE LOOP OVER ACTIONS
@@ -745,7 +732,14 @@ program radmc3d
                  stop 77
               endif
            else
-              stop 78
+              !
+              ! Unstructured grid
+              !
+              camera_image_halfsize_x     = ugrid_radius
+              camera_image_halfsize_y     = ugrid_radius
+              camera_pointing_position(1) = ugrid_center_x
+              camera_pointing_position(2) = ugrid_center_y
+              camera_pointing_position(3) = ugrid_center_z
            endif
         endif
      endif
@@ -841,6 +835,8 @@ program radmc3d
                       ieventcounttot/(1.d0*rt_mcparams%nphot_therm)
            write(stdo,*) 'Average nr of times a photon stays in the same cell  = ', &
                       mc_revisitcell/(1.d0*mc_visitcell)
+           write(stdo,*) 'Maximum nr of times a photon stayed in the same cell = ', &
+                      int(mc_revisitcell_max)
            if(.not.rt_mcparams%mod_random_walk) then
               if(mc_revisitcell/(1.d0*mc_visitcell).gt.400) then
                  write(stdo,*) '   ---> This number is very high, and therefore responsible for slow performance.'
@@ -1694,8 +1690,12 @@ program radmc3d
               stop 6503
            endif
         else
-           write(stdo,*) 'ERROR: In computing subbox default size: unstructured grids not yet supported'
-           stop
+           subbox_x0 = ugrid_center_x - 1.01d0*ugrid_radius
+           subbox_x1 = ugrid_center_x + 1.01d0*ugrid_radius
+           subbox_y0 = ugrid_center_y - 1.01d0*ugrid_radius
+           subbox_y1 = ugrid_center_y + 1.01d0*ugrid_radius
+           subbox_z0 = ugrid_center_z - 1.01d0*ugrid_radius
+           subbox_z1 = ugrid_center_z + 1.01d0*ugrid_radius
         endif
      endif
      !
@@ -2345,6 +2345,7 @@ subroutine read_radmcinp_file()
      call parse_input_double ('camera_maxdphi@               ',camera_maxdphi)
      call parse_input_integer('sources_interpol_jnu@         ',interpoljnu)
 !     call parse_input_double ('lines_maxdoppler@             ',lines_maxdoppler)
+     call parse_input_double ('linewideningfactor@           ',lines_artificial_widening_factor)
      call parse_input_integer('lines_mode@                   ',lines_mode)
      call parse_input_integer('lines_autosubset@             ',iautosubset)
      call parse_input_double ('lines_widthmargin@            ',lines_widthmargin)
@@ -2521,7 +2522,7 @@ subroutine interpet_command_line_options(gotit,fromstdi,quit)
   integer :: iarg,numarg
   double precision :: dum,zoom_x0,zoom_x1,zoom_y0,zoom_y1,px,py
   integer :: idum
-  logical :: gotit,flagzoom,truepix,truezoom,quit,fromstdi
+  logical :: gotit,flagzoom,truepix,truezoom,quit,fromstdi,hertz
   !
   gotit    = .false.
   quit     = .false.
@@ -3019,6 +3020,34 @@ subroutine interpet_command_line_options(gotit,fromstdi,quit)
         iarg = iarg+1
         read(buffer,*) rt_mcparams%nphot_mono
         gotit = .true.
+     elseif(buffer(1:10).eq.'selectscat') then
+        !
+        ! Select which scattering to include. For instance, if you want to
+        ! see the role of multiple scattering, you can do selectscat 2 1000000.
+        ! Or if you are interested only in the second scattering you can do
+        ! selectscat 2 2. Or only first scattering: selectscat 1 1.
+        ! NOTE: Only for analysis or debugging, not for production runs!
+        !
+        if(iarg+1.gt.numarg) then
+           write(stdo,*) 'ERROR while reading command line options: cannot read selectscat.'
+           write(stdo,*) '      Expecting 2 integers after selectscat.'
+           stop
+        endif
+        call ggetarg(iarg,buffer,fromstdi)
+        iarg = iarg+1
+        read(buffer,*) selectscat_iscat_first
+        if(selectscat_iscat_first.lt.1) then
+           write(stdo,*) 'ERROR: selectscat_iscat_first must be .ge.1'
+           stop 3284
+        endif
+        call ggetarg(iarg,buffer,fromstdi)
+        iarg = iarg+1
+        read(buffer,*) selectscat_iscat_last
+        if(selectscat_iscat_last.lt.selectscat_iscat_first) then
+           write(stdo,*) 'ERROR: selectscat_iscat_last must be .ge.selectscat_iscat_first'
+           stop 3285
+        endif
+        gotit = .true.
      elseif(buffer(1:10).eq.'countwrite') then
         !
         ! Set how often RADMC-3D writes a progress line in a Monte Carlo run (default = 1000)
@@ -3486,10 +3515,17 @@ subroutine interpet_command_line_options(gotit,fromstdi,quit)
            write(stdo,*) '      Expecting 1 real after nuhz/lambdamic.'
            stop
         endif
+        if(buffer(1:4).eq.'nuhz') then
+           hertz=.true.
+        else
+           hertz=.false.
+        endif
         call ggetarg(iarg,buffer,fromstdi)
         iarg = iarg+1
         read(buffer,*) camera_lambdamic
-        if(buffer(1:4).eq.'nuhz') then
+        ! BUGFIX 31.05.2023: The commandline nuhz could not work properly because buffer was overwritten.
+        !                    Apparently nobody ever used nuhz, because nobody ever complained ;-).
+        if(hertz) then
            camera_lambdamic = 1d4*cc/camera_lambdamic
         endif
      elseif((buffer(1:10).eq.'globalfreq').or.(buffer(1:9).eq.'globallam').or.&
@@ -3564,6 +3600,15 @@ subroutine interpet_command_line_options(gotit,fromstdi,quit)
         !
         camera_catch_doppler_line = .true.
         camera_secondorder = .true.
+     elseif(buffer(1:18).eq.'linewideningfactor') then
+        !
+        ! Activate artificial line widening to avoid doppler jumps.
+        ! Set this to 1.0 for standard line widening. Larger than 1.0 is
+        ! stronger line widening. 
+        !
+        call ggetarg(iarg,buffer,fromstdi)
+        iarg = iarg+1
+        read(buffer,*) lines_artificial_widening_factor
      elseif(buffer(1:8).eq.'inclstar') then
         !
         ! Make sure that the stars are included in the images and SEDs,
@@ -3903,22 +3948,6 @@ subroutine interpet_command_line_options(gotit,fromstdi,quit)
         endif
   endif
   !
-  ! Check that SED and lines are not on simultaneously
-  !
-  if(rt_incl_lines.and.do_raytrace_spectrum.and.camera_setfreq_global) then
-     write(stdo,*) 'ERROR: Cannot make SED with line mode on.'
-     stop
-  endif
-  !
-  ! If spectrum is on, and line is on, and nr of frequencies is 1, then 
-  ! we put nr of freqs to 100 per default
-  !
-!  if(rt_incl_lines.and.do_raytrace_spectrum.and.(lines_user_nrfreq.le.1)) then
-!     write(stdo,*) 'For line spectra we take nr of frequencies to 100 by default'
-!     write(stdo,*) '   Specify with linenlam or linenfreq if you want another nr.'
-!     lines_user_nrfreq = 100
-!  endif
-  !
   ! Check for camera 
   !
   if((camera_range_nlam.gt.0).and.((camera_lambdamic.le.0.d0).or. &
@@ -3965,9 +3994,8 @@ subroutine write_banner()
   write(stdo,*) '     The reliability of this code depends on your vigilance!    '
   write(stdo,*) '                   dullemond@uni-heidelberg.de                  '
   write(stdo,*) '                                                                '
-  write(stdo,*) '  To keep up-to-date with bug-alarms and bugfixes, register to  '
-  write(stdo,*) '                    the RADMC-3D forum:                         '
-  write(stdo,*) '           http://radmc3d.ita.uni-heidelberg.de/phpbb/          '
+  write(stdo,*) '     To keep up-to-date with bug-alarms and bugfixes, see       '
+  write(stdo,*) '            https://github.com/dullemond/radmc3d-2.0            '
   write(stdo,*) '                                                                '
   write(stdo,*) '             Please visit the RADMC-3D home page at             '
   write(stdo,*) ' http://www.ita.uni-heidelberg.de/~dullemond/software/radmc-3d/ '
